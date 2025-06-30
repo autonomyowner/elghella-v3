@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Default: object-fill */
+.hero-image {
+  object-fit: fill;
+}
+
+/* When the viewport width is smaller than the image width (for mobile/tablet) */
+@media (max-width: 1200px) {
+  .hero-image {
+    object-fit: cover; /* Image will cover the container */
+  }
+}
+
+/* When the viewport height is smaller than the image height */
+@media (max-height: 800px) {
+  .hero-image {
+    object-fit: cover; /* Image will cover the container */
+  }
+}
+
+@font-face {
+  font-family: "NeoSansArabicLight";
+  src: url("./styles/fonts/NeoSansArabicLight.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NeoSansArabicRegular";
+  src: url("./styles/fonts/Neo Sans Arabic Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NeoSansArabicMedium";
+  src: url("./styles/fonts/NeoSansArabicMedium.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NeoSansArabicBold";
+  src: url("./styles/fonts/NeoSansArabicBold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NeoSansArabicBlack";
+  src: url("./styles/fonts/NeoSansArabicBlack.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NeoSansArabicUltra";
+  src: url("./styles/fonts/NeoSansArabicUltra.woff") format("woff");
+}
