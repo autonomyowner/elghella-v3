@@ -28,6 +28,7 @@ export default function PublicListings() {
   const [sending, setSending] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 
+  // Fetch all items
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true);

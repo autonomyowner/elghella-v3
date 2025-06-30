@@ -15,6 +15,8 @@ import AddEquipment from "./pages/EquipmentPage/AddEquipment";
 import ManageListingsPage from "./pages/Profile/ManageInventory";
 import PublicListings from "./pages/PublicListings";
 import Inbox from "./pages/Inbox";
+import AddExpert from "./pages/ExpertsPage/AddExpert";
+import ExpertsList from "./pages/ExpertsPage/ExpertsList";
 
 const AppRoutes = () => {
   return (
@@ -61,7 +63,12 @@ const AppRoutes = () => {
         <Route path="/inbox" element={<Inbox />} />
       </Route>
 
+      <Route element={<ProtectedRoute redirectTo="/login" />}>
+        <Route path="/experts/add" element={<AddExpert />} />
+      </Route>
+
       <Route path="/publiclistings" element={<PublicListings />} />
+      <Route path="/experts" element={<ExpertsList />} />
     </Routes>
   );
 };

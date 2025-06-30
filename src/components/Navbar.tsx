@@ -35,15 +35,20 @@ export default function Navbar({
   }, []);
 
   const handleNavigation = (href: string) => {
+    // If href starts with '/', navigate directly
+    if (href.startsWith('/')) {
+      if (location.pathname !== href) {
+        navigate(href);
+      }
+      return;
+    }
     const sectionToRouteMap: { [key: string]: string } = {
       hero: "/",
       "our-story": "/",
       services: "/",
       "about-us": "/",
     };
-
     const targetRoute = sectionToRouteMap[href] || "/";
-
     if (location.pathname !== targetRoute) {
       navigate(targetRoute, { state: { scrollTo: href } });
     } else {

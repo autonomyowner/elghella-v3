@@ -59,13 +59,25 @@ export default function EnhancedGroceryManagement() {
       return;
     }
 
+    // Validate price and quantity are positive numbers
+    const priceNum = Number(form.price);
+    const quantityNum = Number(form.quantity);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      setError("يرجى إدخال سعر صالح (أكبر من صفر)");
+      return;
+    }
+    if (isNaN(quantityNum) || quantityNum <= 0) {
+      setError("يرجى إدخال كمية صالحة (أكبر من صفر)");
+      return;
+    }
+
     try {
       // Prepare data for API - convert price and quantity to numbers
       const productData = {
         name: form.name,
         type: form.type,
-        price: Number(form.price),
-        quantity: Number(form.quantity),
+        price: priceNum,
+        quantity: quantityNum,
         description: form.description,
       };
 
