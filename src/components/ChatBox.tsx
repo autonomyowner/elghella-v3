@@ -194,6 +194,12 @@ export default function ChatBox({ otherUserId, postId, postType, onClose }: Chat
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-900 rounded-lg shadow-lg w-full max-w-md flex flex-col h-[80vh]">
+        {/* Header image */}
+        <img
+          src="https://elghella-v3-omega.vercel.app/assets/about-us-eWafbHQl.svg"
+          alt="About Us"
+          className="w-full h-32 object-cover rounded-t-lg mb-2"
+        />
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">

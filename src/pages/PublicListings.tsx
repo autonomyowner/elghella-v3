@@ -117,6 +117,37 @@ export default function PublicListings() {
     }
   };
 
+  // Delete post handler
+  const handleDeletePost = async () => {
+    if (!selectedPost) return;
+    if (!user || !user.userId) {
+      alert("يجب تسجيل الدخول لحذف منشور.");
+      return;
+    }
+    // Only allow owner to delete
+    if (selectedPost.user_id !== user.userId) {
+      alert("يمكنك فقط حذف منشوراتك.");
+      return;
+    }
+    if (!window.confirm("هل أنت متأكد أنك تريد حذف هذا المنشور؟")) return;
+    try {
+      if (selectedPost._type === "product") {
+        await import("../api/myProductApi").then(api => api.deleteProductApi(selectedPost.id));
+        setProducts(products.filter(p => p.id !== selectedPost.id));
+      } else if (selectedPost._type === "equipment") {
+        await import("../api/myEquipmentApi").then(api => api.deleteEquipmentApi(selectedPost.id));
+        setEquipment(equipment.filter(e => e.id !== selectedPost.id));
+      } else if (selectedPost._type === "land") {
+        await import("../api/myLandApi").then(api => api.deleteLandApi(selectedPost.id));
+        setLands(lands.filter(l => l.id !== selectedPost.id));
+      }
+      closeModal();
+    } catch (err) {
+      alert("فشل حذف المنشور. حاول مرة أخرى.");
+      console.error(err);
+    }
+  };
+
   return (
     <section dir="rtl" className="relative min-h-screen flex flex-col">
       {/* Modal for post details and messaging */}
@@ -137,6 +168,15 @@ export default function PublicListings() {
               {selectedPost.condition && <div className="text-gray-400">{selectedPost.condition}</div>}
               {selectedPost.description && <div className="text-gray-400">{selectedPost.description}</div>}
             </div>
+            {/* Delete button for owner */}
+            {user && selectedPost.user_id === user.userId && (
+              <button
+                onClick={handleDeletePost}
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded mb-2 mt-2"
+              >
+                حذف المنشور
+              </button>
+            )}
             {/* Message form */}
             <div className="mt-4">
               <h4 className="text-green-300 font-bold mb-2">مراسلة البائع</h4>
