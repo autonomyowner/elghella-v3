@@ -57,30 +57,20 @@ export default function Sidebar({
 
   // Handle navigation for sidebar links
   const handleNavigation = (href: string) => {
-    // Map the section IDs to their corresponding routes
-    const sectionToRouteMap: { [key: string]: string } = {
-      hero: "/",
-      "our-story": "/",
-      services: "/",
-      "about-us": "/",
-    };
-
-    // Determine the target route based on the href
-    const targetRoute = sectionToRouteMap[href] || "/";
-
-    // Close the sidebar
-    toggleSidebar();
-
-    // If we're not on the target route, navigate to it first
-    if (location.pathname !== targetRoute) {
-      navigate(targetRoute, { state: { scrollTo: href } });
-    } else {
-      // If already on the correct route, scroll to the section
-      const element = document.getElementById(href);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+    // If href starts with '/', treat as route
+    if (href.startsWith('/')) {
+      toggleSidebar();
+      if (location.pathname !== href) {
+        navigate(href);
       }
+      return;
     }
+    // Otherwise, scroll to section on the current page
+    const element = document.getElementById(href);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+    toggleSidebar();
   };
 
   // Add useEffect to handle scroll on route change
