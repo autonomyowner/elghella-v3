@@ -23,8 +23,8 @@ const SettingsPage = () => {
           const response = await authService.getCurrentUser(); // Get the response object
           const data = response; // response is already the user object
           if (data) {
-            setName(data.name || ""); // Use optional chaining for name
-            setTelephone(data.telephone || ""); // Use optional chaining for telephone
+            setName(data.user_metadata?.name || ""); // Use optional chaining for name
+            setTelephone(data.user_metadata?.telephone || ""); // Use optional chaining for telephone
           }
         } catch {
           setError("فشل في تحميل البيانات");
