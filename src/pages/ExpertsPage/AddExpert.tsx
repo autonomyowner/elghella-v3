@@ -84,8 +84,18 @@ export default function AddExpert() {
     }
   };
 
+  // Warn if Supabase env variables are missing (for Vercel debugging)
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const missingEnv = !supabaseUrl || !supabaseKey;
+
   return (
     <section className="py-16 md:py-20 text-right dir-rtl relative font-['NeoSansArabicRegular']">
+      {missingEnv && (
+        <div style={{ background: '#fee2e2', color: '#b91c1c', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center' }}>
+          ⚠️ تحذير: إعدادات Supabase غير موجودة! تحقق من متغيرات البيئة في Vercel.
+        </div>
+      )}
       <div className="container mx-auto px-4 flex flex-col items-center lg:items-end">
         <div className="w-full max-w-4xl flex flex-col lg:flex-row items-stretch">
           <div className="w-full">
