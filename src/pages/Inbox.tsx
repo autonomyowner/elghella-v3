@@ -56,7 +56,8 @@ export default function Inbox() {
 
   // Error boundary for unexpected errors
   React.useEffect(() => {
-    window.onerror = (msg, url, line, col, err) => {
+    // Remove unused variables 'url', 'line', 'col' from window.onerror
+    window.onerror = (msg, _url, _line, _col, err) => {
       setFatal(String(msg) + (err ? (": " + err.message) : ""));
       return false;
     };

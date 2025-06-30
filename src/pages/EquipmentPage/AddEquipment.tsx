@@ -4,7 +4,6 @@ import {
   Wrench,
   DollarSign,
   FileText,
-  Calendar,
   TowerControl,
 } from "lucide-react";
 import { addEquipmentApi } from "../../api/myEquipmentApi";

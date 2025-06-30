@@ -21,10 +21,10 @@ const SettingsPage = () => {
       if (isAuthenticated && user) {
         try {
           const response = await authService.getCurrentUser(); // Get the response object
-          const data = response.data; // Extract the `data` property containing the user
+          const data = response; // response is already the user object
           if (data) {
-            setName(data.name); // Use `data.name` instead of `data.data.name`
-            setTelephone(data.telephone || ""); // Handle optional `telephone` field
+            setName(data.name || ""); // Use optional chaining for name
+            setTelephone(data.telephone || ""); // Use optional chaining for telephone
           }
         } catch {
           setError("فشل في تحميل البيانات");
