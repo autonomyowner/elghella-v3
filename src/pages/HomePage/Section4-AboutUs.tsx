@@ -1,7 +1,6 @@
 const Section4AboutUs = () => {
   return (
     <div className="py-16 md:py-20 font-['NeoSansArabicRegular']">
-      {" "}
       <div className="container mx-auto px-4 max-w-6xl" dir="rtl">
         <div className="flex flex-col-reverse sm:flex-row items-center justify-between space-y-8 sm:space-y-0 sm:space-x-12">
           <div className="sm:w-1/2 text-right space-y-6">
@@ -34,7 +33,7 @@ const Section4AboutUs = () => {
           <div className="sm:w-1/2 flex justify-center mb-8 sm:mb-0">
             <div className="w-full max-w-md transform transition-all duration-300 hover:scale-105 hover:shadow-xl rounded-xl overflow-hidden">
               <img
-                src="/assets/Homepage/west.jpg"
+                src="/assets/Homepage/vr.png"
                 alt="About Us"
                 className="w-full h-auto object-contain"
               />

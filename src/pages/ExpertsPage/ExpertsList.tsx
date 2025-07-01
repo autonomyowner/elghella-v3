@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getExpertsApi } from "../../api/getExpertsApi";
+import ChatBox from "../../components/ChatBox";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ExpertsList() {
   const [experts, setExperts] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [chatExpertId, setChatExpertId] = useState<string | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     getExpertsApi()
@@ -42,13 +46,13 @@ export default function ExpertsList() {
           dir="rtl"
         />
         {error && <div className="text-red-500 mb-4">{error}</div>}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           {filtered.map((expert) => (
-            <div key={expert.id} className="bg-gray-900 rounded-lg p-6 shadow-lg flex flex-col items-center">
+            <div key={expert.id} className="bg-gray-900 rounded-lg p-10 shadow-lg flex flex-col items-center min-w-[350px] max-w-[500px] w-full">
               <img
                 src={expert.image_url}
                 alt={expert.name}
-                className="w-32 h-32 object-cover rounded-full mb-4 border-4 border-green-600"
+                className="w-40 h-40 object-cover rounded-full mb-4 border-4 border-green-600"
               />
               <h3 className="text-xl font-bold text-white mb-1">{expert.name} {expert.prename}</h3>
               <div className="text-green-400 mb-1">{expert.wilaya}</div>
@@ -56,9 +60,34 @@ export default function ExpertsList() {
               <div className="text-gray-400 text-sm mb-2">{expert.description}</div>
               <div className="text-white font-bold mt-2">📧 {expert.email}</div>
               <div className="text-white font-bold">📞 {expert.phone}</div>
+              {user && user.userId !== expert.id && (
+                <button
+                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition-colors duration-300 shadow-lg"
+                  onClick={() => {
+                    console.log('Open chat with expert.id:', expert.id, 'user.userId:', user.userId);
+                    setChatExpertId(expert.id);
+                  }}
+                >
+                  إرسال رسالة
+                </button>
+              )}
             </div>
           ))}
         </div>
+        {chatExpertId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+            <div className="bg-gray-900 rounded-lg shadow-xl p-4 max-w-lg w-full relative">
+              <button
+                className="absolute top-2 left-2 text-white text-2xl"
+                onClick={() => setChatExpertId(null)}
+                aria-label="إغلاق المحادثة"
+              >
+                ×
+              </button>
+              <ChatBox otherUserId={chatExpertId} postId={""} postType={""} onClose={() => setChatExpertId(null)} />
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

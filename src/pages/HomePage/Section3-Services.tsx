@@ -5,7 +5,7 @@ const services = [
     title: "كراء اراضي فلاحية",
     description:
       "تمتع بامكانية كراء اراضي فلاحية واسعة لضمان عمليات زراعية سلسة",
-    image: "/assets/Homepage/west.jpg",
+    image: "/assets/Homepage/trees.png",
     icon: "/assets/Homepage/landrent-icon.svg",
     route: "/land-rent",
   },

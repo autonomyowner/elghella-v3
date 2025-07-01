@@ -177,6 +177,16 @@ export default function Sidebar({
           </button>
         ))}
 
+        {/* Inbox Link for authenticated users */}
+        {isAuthenticated && (
+          <button
+            onClick={() => { toggleSidebar(); navigate('/inbox'); }}
+            className="text-lg text-blue-400 hover:bg-gray-700 px-4 py-2 rounded-lg w-full text-right font-['NeoSansArabicMedium']"
+          >
+            صندوق الرسائل
+          </button>
+        )}
+
         {/* Login/User Button with Truncated Email */}
         <a
           href={isAuthenticated ? "/profile" : "/login"}
