@@ -46,7 +46,7 @@ const Footer = () => {
             <div className="flex-1 bg-green-900 bg-opacity-90 rounded-xl shadow-lg flex flex-col md:flex-row items-stretch overflow-hidden border-2 border-green-500 group transition-transform duration-300 hover:scale-105">
               <div className="w-full aspect-video md:w-1/3 flex-shrink-0">
                 <img
-                  src="/src/assets/Homepage/landrent.svg"
+                  src="/assets/Homepage/landrent.svg"
                   alt="شتلات زراعية"
                   className="w-full h-full object-cover rounded-t-xl md:rounded-none md:rounded-r-lg transition-transform duration-300 group-hover:scale-110"
                   loading="lazy"
@@ -88,7 +88,7 @@ const Footer = () => {
             <div className="flex-1 bg-gray-900 bg-opacity-90 rounded-xl shadow-lg flex flex-col md:flex-row items-stretch overflow-hidden border-2 border-green-500 group transition-transform duration-300 hover:scale-105">
               <div className="w-full aspect-video md:w-1/3 flex-shrink-0">
                 <img
-                  src="/src/assets/Homepage/truck.jpg"
+                  src="/assets/Homepage/truck.jpg"
                   alt="شاحنة التوصيل"
                   className="w-full h-full object-cover rounded-t-xl md:rounded-none md:rounded-r-lg transition-transform duration-300 group-hover:scale-110"
                   loading="lazy"
