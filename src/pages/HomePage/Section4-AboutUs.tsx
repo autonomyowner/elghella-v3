@@ -34,7 +34,7 @@ const Section4AboutUs = () => {
           <div className="sm:w-1/2 flex justify-center mb-8 sm:mb-0">
             <div className="w-full max-w-md transform transition-all duration-300 hover:scale-105 hover:shadow-xl rounded-xl overflow-hidden">
               <img
-                src="/west.jpg"
+                src="/assets/Homepage/west.jpg"
                 alt="About Us"
                 className="w-full h-auto object-contain"
               />

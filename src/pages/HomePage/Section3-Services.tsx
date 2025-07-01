@@ -1,44 +1,36 @@
 import { useNavigate } from "react-router-dom";
-import landrent from "../../assets/Homepage/landrent.svg";
-import machinerent from "../../assets/Homepage/machinerent.svg";
-import greengrocer from "../../assets/Homepage/greengrocer.svg";
-import expertise from "../../assets/Homepage/expertise.svg";
-import landrenticon from "../../assets/Homepage/landrent-icon.svg";
-import machinerenticon from "../../assets/Homepage/machinerent-icon.svg";
-import greengrocericon from "../../assets/Homepage/greengrocer-icon.svg";
-import expertiseicon from "../../assets/Homepage/expertise-icon.svg";
 
 const services = [
   {
     title: "كراء اراضي فلاحية",
     description:
       "تمتع بامكانية كراء اراضي فلاحية واسعة لضمان عمليات زراعية سلسة",
-    image: landrent,
-    icon: landrenticon,
+    image: "/assets/Homepage/west.jpg",
+    icon: "/assets/Homepage/landrent-icon.svg",
     route: "/land-rent",
   },
   {
     title: "منتجات زراعية طازجة",
     description:
       "تواصل مباشرة مع الفلاحين المحليين للمنتاجات الطازجة من الحقل مباشرة اليك",
-    image: greengrocer,
-    icon: greengrocericon,
+    image: "/assets/Homepage/greengrocer.svg",
+    icon: "/assets/Homepage/greengrocer-icon.svg",
     route: "/greengrocer",
   },
   {
     title: "خدمات استشارية فلاحية متخصصة",
     description:
       "احصل على نصائح من خبراء فلاحين المتمرسين لزيادة أنتاجية مزرعتك و استدامتها",
-    image: expertise,
-    icon: expertiseicon,
+    image: "/assets/Homepage/expertise.svg",
+    icon: "/assets/Homepage/expertise-icon.svg",
     route: "/expertise", // You can update this to the appropriate route
   },
   {
     title: "تأجير معدات فلاحية",
     description:
       "تمتع بامكانية كراء مجموعة واسعة من الأدوات و الألات الفلاحية لضمان عمليات زراعية سلسة",
-    image: machinerent,
-    icon: machinerenticon,
+    image: "/assets/Homepage/machinerent.svg",
+    icon: "/assets/Homepage/machinerent-icon.svg",
     route: "/machine-rent",
   },
 ];
