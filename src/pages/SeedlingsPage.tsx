@@ -1,5 +1,3 @@
-import React from "react";
-
 const seedlings = [
   {
     name: "شتلات طماطم \"أكزونا\" – Axona",
