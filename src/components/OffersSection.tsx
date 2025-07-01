@@ -4,7 +4,7 @@ const OffersSection = () => (
       {/* Seedlings Offer */}
       <div className="flex-1 rounded-xl shadow-lg overflow-hidden border-2 border-green-500 group transition-transform duration-300 hover:scale-105 relative min-h-[350px] flex flex-col justify-end">
         <img
-          src="/assets/Homepage/trees.png"
+          src="/assets/Homepage/trees.webp"
           alt="شتلات زراعية"
           className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-300 group-hover:scale-110"
           loading="lazy"
@@ -45,7 +45,7 @@ const OffersSection = () => (
       {/* Transport Offer */}
       <div className="flex-1 rounded-xl shadow-lg overflow-hidden border-2 border-green-500 group transition-transform duration-300 hover:scale-105 relative min-h-[350px] flex flex-col justify-end">
         <img
-          src="/assets/Homepage/west.png"
+          src="/assets/Homepage/west.webp"
           alt="شاحنة التوصيل"
           className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-300 group-hover:scale-110"
           loading="lazy"

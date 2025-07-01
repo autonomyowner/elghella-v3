@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://elghella.com/sitemap.xml 
