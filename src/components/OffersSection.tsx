@@ -1,5 +1,3 @@
-import React from "react";
-
 const OffersSection = () => (
   <section aria-label="العروض" className="mb-10">
     <div className="flex flex-col gap-8 md:flex-row justify-between items-stretch">
