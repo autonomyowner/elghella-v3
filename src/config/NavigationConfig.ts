@@ -8,5 +8,5 @@ export const navigationLinks: NavLink[] = [
   { name: "الخدمات", href: "/publiclistings" },
   { name: "الخبراء", href: "/experts" },
   { name: "من نحن", href: "our-story" }, // Scroll to 'our-story' section
-  { name: "اتصل بنا", href: "/contact" },
+  { name: "اتصل بنا", href: "contact-section" }, // Scroll to contact section
 ];

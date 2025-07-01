@@ -6,6 +6,7 @@ import ContactModal from "../../components/CheckoutPopUp";
 import Image from "../../assets/MachineRentPage/image.svg";
 import { useAuth } from "../../context/AuthContext";
 import { fetchEquipments } from "../../api/Equipments"; // Corrected import path
+import { Link } from "react-router-dom";
 
 // Define an interface for equipment
 interface Equipment {
@@ -67,9 +68,10 @@ export default function Section2MachineSearch() {
   }) => {
     const filtered = equipments.filter((equipment) => {
       // Extract numeric price from string (remove $ and /day if present)
-      const equipmentPrice = parseFloat(
-        equipment.price.replace("$", "دينار").replace("/day", "")
-      );
+      const equipmentPrice =
+        typeof equipment.price === "string"
+          ? parseFloat(equipment.price.replace("$", "").replace("/day", ""))
+          : Number(equipment.price);
 
       const priceMatch =
         (filters.priceRange[0] === 0 && filters.priceRange[1] === 1000) ||
@@ -193,6 +195,16 @@ export default function Section2MachineSearch() {
 
           {/* Main Content */}
           <div className="w-full md:w-3/4">
+            {/* Add Equipment Button - New Feature */}
+            <div className="flex justify-end mb-6">
+              <Link
+                to="/addequipment"
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full transition-all duration-300 font-NeoSansArabicBold"
+              >
+                أضف معدات جديدة
+              </Link>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredCards.map((equipment) => (
                 <div key={equipment.equipmentId} onClick={openModal}>
@@ -201,7 +213,11 @@ export default function Section2MachineSearch() {
                     title={equipment.name}
                     description={equipment.description}
                     rating={4} // Hardcoded for now, as backend doesn't provide rating
-                    price={`${equipment.price.replace("$"," يوم/دينار ")}`}
+                    price={
+                      typeof equipment.price === "string"
+                        ? equipment.price.replace("$", " يوم/دينار ")
+                        : equipment.price + " يوم/دينار "
+                    }
                   />
                 </div>
               ))}

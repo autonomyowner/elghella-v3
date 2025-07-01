@@ -78,6 +78,19 @@ export default function Sidebar({
       }
       return;
     }
+    // Special case: 'اتصل بنا' should scroll to 'contact-section' on main page
+    if (href === 'contact-section') {
+      toggleSidebar();
+      if (location.pathname !== '/') {
+        navigate('/', { state: { scrollTo: 'contact-section' } });
+      } else {
+        const element = document.getElementById('contact-section');
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+      return;
+    }
     // Otherwise, scroll to section on the current page
     const element = document.getElementById(href);
     if (element) {

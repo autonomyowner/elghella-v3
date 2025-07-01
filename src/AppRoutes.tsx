@@ -17,6 +17,7 @@ import PublicListings from "./pages/PublicListings";
 import Inbox from "./pages/Inbox";
 import AddExpert from "./pages/ExpertsPage/AddExpert";
 import ExpertsList from "./pages/ExpertsPage/ExpertsList";
+import SeedlingsPage from "./pages/SeedlingsPage";
 
 const AppRoutes = () => {
   return (
@@ -69,6 +70,7 @@ const AppRoutes = () => {
 
       <Route path="/publiclistings" element={<PublicListings />} />
       <Route path="/experts" element={<ExpertsList />} />
+      <Route path="/SeedlingsPage" element={<SeedlingsPage />} />
     </Routes>
   );
 };

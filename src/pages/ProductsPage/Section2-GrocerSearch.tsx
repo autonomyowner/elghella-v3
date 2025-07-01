@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import SearchCard from "../../components/SearchCard";
 import GreengrocerSearchFilter from "../../components/GreengrocerSearchFilter";
 import ContactModal from "../../components/CheckoutPopUp";
+import ProductDetailsModal from "../../components/ProductDetailsModal.tsx";
 import Image from "../../assets/GreengrocerPage/image.svg";
 import { useAuth } from "../../context/AuthContext";
-import { fetchProducts } from "../../api/ProductApi"; // Adjust the import path as necessary
+import { supabase } from "../../lib/supabaseClient";
 
 interface Product {
   productId: string;
@@ -22,15 +23,20 @@ export default function Section2GreengrocerSearch() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // New state for loading
   const [error, setError] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const fetchedProducts = await fetchProducts();
-        setProducts(fetchedProducts);
-        setFilteredCards(fetchedProducts); // Initially, all products are shown
+        // Fetch only public products from Supabase
+        const { data: publicProducts, error: supaErr } = await supabase
+          .from("products")
+          .select("*");
+        if (supaErr) throw supaErr;
+        setProducts(publicProducts || []);
+        setFilteredCards(publicProducts || []); // Initially, all products are shown
         setError(null);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -42,14 +48,14 @@ export default function Section2GreengrocerSearch() {
     fetchData();
   }, []);
 
-  const openModal = () => {
-    if (!isAuthenticated) {
-      setIsModalOpen(true);
-    }
-  };
-
   const closeModal = () => {
     setIsModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const openProductModal = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
   };
 
   const handleFilterApply = (filters: {
@@ -59,38 +65,30 @@ export default function Section2GreengrocerSearch() {
     searchQuery: string;
   }) => {
     const filtered = products.filter((product) => {
-      // Convert 'price' string to number for comparison
-      const productPrice = parseFloat(
-        product.price.replace("$", "دينار").replace("/month", "")
-      );
+      // Safely parse price as number
+      const priceValue =
+        typeof product.price === "string"
+          ? parseFloat(product.price.replace("$", "").replace("/month", ""))
+          : Number(product.price);
+
       const priceMatch =
         (filters.priceRange[0] === 0 && filters.priceRange[1] === 1000) ||
-        (productPrice >= filters.priceRange[0] &&
-          productPrice <= filters.priceRange[1]);
+        (priceValue >= filters.priceRange[0] && priceValue <= filters.priceRange[1]);
 
       const ratingMatch = !filters.rating || product.rating >= filters.rating;
 
       const GreengrocerTypeMatch =
         !filters.GreengrocerType ||
-        (filters.GreengrocerType === "الحبوب" &&
-          product.title.includes("الحبوب")) ||
-        (filters.GreengrocerType === "الخضروات" &&
-          product.title.includes("الخضروات")) ||
-        (filters.GreengrocerType === "الفواكه" &&
-          product.title.includes("الفواكه")) ||
-        (filters.GreengrocerType === "الأعلاف" &&
-          product.title.includes("الأعلاف")) ||
-        (filters.GreengrocerType === "المكسرات" &&
-          product.title.includes("المكسرات"));
+        (filters.GreengrocerType === "الحبوب" && product.title && product.title.includes("الحبوب")) ||
+        (filters.GreengrocerType === "الخضروات" && product.title && product.title.includes("الخضروات")) ||
+        (filters.GreengrocerType === "الفواكه" && product.title && product.title.includes("الفواكه")) ||
+        (filters.GreengrocerType === "الأعلاف" && product.title && product.title.includes("الأعلاف")) ||
+        (filters.GreengrocerType === "المكسرات" && product.title && product.title.includes("المكسرات"));
 
       const searchMatch =
         !filters.searchQuery ||
-        product.title
-          .toLowerCase()
-          .includes(filters.searchQuery.toLowerCase()) ||
-        product.description
-          .toLowerCase()
-          .includes(filters.searchQuery.toLowerCase());
+        (product.title && product.title.toLowerCase().includes(filters.searchQuery.toLowerCase())) ||
+        (product.description && product.description.toLowerCase().includes(filters.searchQuery.toLowerCase()));
 
       return priceMatch && ratingMatch && GreengrocerTypeMatch && searchMatch;
     });
@@ -184,14 +182,20 @@ export default function Section2GreengrocerSearch() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {Array.isArray(filteredCards) &&
                   filteredCards.map((product, index) => (
-                    <div key={index} onClick={openModal}>
+                    <div key={index} onClick={() => openProductModal(product)} className="cursor-pointer">
                       <SearchCard
                         key={index}
                         image={product.image || Image}
                         title={product.title}
                         description={product.description}
                         rating={product.rating}
-                        price={product.price.replace("$"," دينار ")}
+                        price={
+                          product.price
+                            ? (typeof product.price === 'string'
+                                ? product.price.replace("$", " دينار ")
+                                : product.price + " دينار")
+                            : "غير متوفر"
+                        }
                       />
                     </div>
                   ))}
@@ -208,6 +212,11 @@ export default function Section2GreengrocerSearch() {
 
       {!isAuthenticated && (
         <ContactModal isOpen={isModalOpen} onClose={closeModal} />
+      )}
+
+      {/* Product Details Modal */}
+      {selectedProduct && (
+        <ProductDetailsModal product={selectedProduct} isOpen={isModalOpen} onClose={closeModal} />
       )}
 
       {isFilterOpen && (

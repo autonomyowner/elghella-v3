@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { sendMessage } from "../api/messagesApi";
 import ChatBox from "../components/ChatBox";
+import MarketplaceCard from "../components/MarketplaceCard";
 
 export default function PublicListings() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -297,17 +298,17 @@ export default function PublicListings() {
               {filteredProducts.length === 0 ? (
                 <p className="text-gray-400">لا يوجد منتجات.</p>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   {filteredProducts.map((prod) => (
-                    <div key={prod.id} className="bg-gray-900 rounded-lg p-2 flex flex-col items-center shadow-md hover:shadow-xl transition-all cursor-pointer" onClick={() => openModal(prod, "product")}>
-                      <div className="w-full h-24 bg-gray-800 rounded mb-2 flex items-center justify-center overflow-hidden">
-                        <span className="text-gray-500 text-4xl">🛒</span>
-                      </div>
-                      <span className="font-bold text-white text-sm truncate w-full text-center">{prod.name}</span>
-                      <span className="text-gray-300 text-xs">{prod.type}</span>
-                      <span className="text-green-400 text-xs">{prod.price} دج</span>
-                      <span className="text-gray-400 text-xs">الكمية: {prod.quantity}</span>
-                    </div>
+                    <MarketplaceCard
+                      key={prod.id}
+                      image={"https://placehold.co/300x200?text=Product"}
+                      title={prod.name}
+                      price={prod.price ? prod.price + " دج" : "غير متوفر"}
+                      description={prod.description || "لا يوجد وصف"}
+                      seller={"مجهول"}
+                      onClick={() => openModal(prod, "product")}
+                    />
                   ))}
                 </div>
               )}
@@ -318,21 +319,17 @@ export default function PublicListings() {
               {filteredEquipment.length === 0 ? (
                 <p className="text-gray-400">لا يوجد معدات.</p>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   {filteredEquipment.map((eq) => (
-                    <div key={eq.id} className="bg-gray-900 rounded-lg p-2 flex flex-col items-center shadow-md hover:shadow-xl transition-all cursor-pointer" onClick={() => openModal(eq, "equipment")}>
-                      <div className="w-full h-24 bg-gray-800 rounded mb-2 flex items-center justify-center overflow-hidden">
-                        {Array.isArray(eq.images) && eq.images.length > 0 ? (
-                          <img src={eq.images[0]} alt={eq.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="text-gray-500 text-4xl">🛠️</span>
-                        )}
-                      </div>
-                      <span className="font-bold text-white text-sm truncate w-full text-center">{eq.name}</span>
-                      <span className="text-gray-300 text-xs">{eq.type}</span>
-                      <span className="text-green-400 text-xs">{eq.price} دج</span>
-                      <span className="text-gray-400 text-xs">{eq.condition}</span>
-                    </div>
+                    <MarketplaceCard
+                      key={eq.id}
+                      image={Array.isArray(eq.images) && eq.images.length > 0 ? eq.images[0] : "https://placehold.co/300x200?text=Equipment"}
+                      title={eq.name}
+                      price={eq.price ? eq.price + " دج" : "غير متوفر"}
+                      description={eq.condition || "لا يوجد وصف"}
+                      seller={eq.seller || eq.owner || "مجهول"}
+                      onClick={() => openModal(eq, "equipment")}
+                    />
                   ))}
                 </div>
               )}
@@ -343,16 +340,17 @@ export default function PublicListings() {
               {filteredLands.length === 0 ? (
                 <p className="text-gray-400">لا يوجد أراضي.</p>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   {filteredLands.map((land) => (
-                    <div key={land.id} className="bg-gray-900 rounded-lg p-2 flex flex-col items-center shadow-md hover:shadow-xl transition-all cursor-pointer" onClick={() => openModal(land, "land")}>
-                      <div className="w-full h-24 bg-gray-800 rounded mb-2 flex items-center justify-center overflow-hidden">
-                        <span className="text-gray-500 text-4xl">🌱</span>
-                      </div>
-                      <span className="font-bold text-white text-sm truncate w-full text-center">{land.name || land.title || "أرض بدون اسم"}</span>
-                      <span className="text-gray-300 text-xs">{land.type || "نوع غير محدد"}</span>
-                      <span className="text-green-400 text-xs">{land.price ? `${land.price} دج` : ""}</span>
-                    </div>
+                    <MarketplaceCard
+                      key={land.id}
+                      image={land.image || "https://placehold.co/300x200?text=Land"}
+                      title={land.name || land.title || "أرض بدون اسم"}
+                      price={land.price ? land.price + " دج" : "غير متوفر"}
+                      description={land.description || "لا يوجد وصف"}
+                      seller={land.seller || land.owner || "مجهول"}
+                      onClick={() => openModal(land, "land")}
+                    />
                   ))}
                 </div>
               )}
