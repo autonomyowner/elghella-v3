@@ -65,6 +65,19 @@ export default function Sidebar({
       }
       return;
     }
+    // Special case: 'من نحن' should scroll to 'our-story' section on main page
+    if (href === 'our-story') {
+      toggleSidebar();
+      if (location.pathname !== '/') {
+        navigate('/', { state: { scrollTo: 'our-story' } });
+      } else {
+        const element = document.getElementById('our-story');
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+      return;
+    }
     // Otherwise, scroll to section on the current page
     const element = document.getElementById(href);
     if (element) {
