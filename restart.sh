@@ -1,29 +1,44 @@
 #!/bin/bash
 
-echo "🚀 RESETTING ELGHELLA MILLION DOLLAR SAAS..."
+echo "� EMERGENCY RESTART - Elghella Platform"
+echo "========================================"
 
-# Kill all processes
-echo "🔄 Stopping all processes..."
-pkill -f vite 2>/dev/null || true
-pkill -f npm 2>/dev/null || true
+echo "🧹 Step 1: Cleaning all processes..."
+pkill -f "npm run dev" 2>/dev/null
+pkill -f "vite" 2>/dev/null
+pkill -f "node.*vite" 2>/dev/null
 sleep 3
 
-# Clear cache
-echo "🧹 Clearing cache..."
-rm -rf node_modules/.vite 2>/dev/null || true
-rm -rf dist 2>/dev/null || true
+echo "🔍 Step 2: Checking for remaining processes..."
+REMAINING=$(ps aux | grep -E "(npm|vite)" | grep -v grep | wc -l)
+if [ $REMAINING -gt 0 ]; then
+    echo "⚠️  Found $REMAINING remaining processes, force killing..."
+    pkill -9 -f vite 2>/dev/null
+    sleep 2
+fi
 
-# Install dependencies
-echo "📦 Installing dependencies..."
-npm install --silent
+echo "� Step 3: Starting fresh server..."
+echo "📍 Trying port 3000 first..."
 
-# Start development server
-echo "🚀 Starting development server..."
-echo "✅ Server will be available at: http://localhost:5173"
-echo "✅ Test page available at: http://localhost:5173/test-simple.html"
-echo "✅ Status page available at: http://localhost:5173/status.html"
-echo ""
-echo "🌟 ELGHELLA MILLION DOLLAR SAAS STARTING..."
-echo ""
+# Try port 3000 first
+if npm run dev &
+then
+    sleep 5
+    if curl -s http://localhost:3000 > /dev/null 2>&1; then
+        echo "✅ SUCCESS: Server running on http://localhost:3000"
+        exit 0
+    fi
+fi
 
-npm run dev
+echo "📍 Port 3000 busy, trying port 3001..."
+npm run dev-backup &
+sleep 5
+
+if curl -s http://localhost:3001 > /dev/null 2>&1; then
+    echo "✅ SUCCESS: Server running on http://localhost:3001"
+else
+    echo "❌ FAILED: Please check manually with npm run dev"
+    exit 1
+fi
+
+echo "🎉 Elghella Platform is ONLINE!"
