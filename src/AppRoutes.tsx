@@ -18,6 +18,7 @@ import Inbox from "./pages/Inbox";
 import AddExpert from "./pages/ExpertsPage/AddExpert";
 import ExpertsList from "./pages/ExpertsPage/ExpertsList";
 import SeedlingsPage from "./pages/SeedlingsPage";
+import GalleryPage from "./pages/GalleryPage";
 
 const AppRoutes = () => {
   return (
@@ -31,6 +32,8 @@ const AppRoutes = () => {
       <Route path="/greengrocer" element={<Products />} />
 
       <Route path="/expertise" element={<Expertise />} />
+
+      <Route path="/gallery" element={<GalleryPage />} />
 
       <Route path="/Login" element={<LoginPage />} />
       <Route path="/Signup" element={<SignUpPage />} />
