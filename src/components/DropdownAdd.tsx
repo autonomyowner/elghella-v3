@@ -37,19 +37,22 @@ const DropdownAdd: React.FC<DropdownAddProps> = ({
   // Dropdown menu items
   const menuItems = [
     {
-      icon: PiFarm,
-      label: "تأجير أراضي",
-      route: "/addlandrent",
+      icon: AiOutlineApple,
+      label: "إضافة منتج جديد",
+      route: "/add-product",
+      description: "أضف منتجك إلى المنصة"
     },
     {
-      icon: AiOutlineApple,
-      label: "إضافة منتجات",
-      route: "/addproduct",
+      icon: PiFarm,
+      label: "قوائم المنتجات",
+      route: "/public-listings",
+      description: "تصفح جميع المنتجات"
     },
     {
       icon: GiFarmTractor,
-      label: "تأجير معدات",
-      route: "addequipment",
+      label: "ملفي الشخصي",
+      route: "/profile",
+      description: "إدارة حسابك"
     },
   ];
 
@@ -79,15 +82,23 @@ const DropdownAdd: React.FC<DropdownAddProps> = ({
               to={item.route}
               onClick={() => setIsOpen(false)}
               className="
-                flex items-center justify-between px-4 py-3 
+                flex items-center px-4 py-3 
                 hover:bg-gray-700 
                 transition-colors duration-300
                 text-gray-200
                 font-['NeoSansArabicRegular']
+                group
               "
             >
-              <item.icon className="w-5 h-5" />
-              <span className="text-sm">{item.label}</span>
+              <item.icon className="w-5 h-5 ml-3 group-hover:text-green-400 transition-colors" />
+              <div className="flex-1 text-right">
+                <div className="text-sm font-semibold group-hover:text-white transition-colors">
+                  {item.label}
+                </div>
+                <div className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors">
+                  {item.description}
+                </div>
+              </div>
             </Link>
           ))}
         </div>

@@ -15,6 +15,7 @@ import Inbox from "./pages/Inbox";
 import PublicListings from "./pages/PublicListings";
 import SeedlingsPage from "./pages/SeedlingsPage";
 import LoginPage from "./pages/auth/LoginPage";
+import AddProduct from "./pages/AddProduct";
 
 // Lazy load improved components for better performance
 const AnalyticsDashboard = lazy(() => import("./pages/Dashboard/AnalyticsDashboard"));
@@ -138,6 +139,16 @@ function AppRoutes() {
                 element={
                   <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
                     <LoginPage />
+                  </motion.div>
+                } 
+              />
+
+              {/* Marketplace */}
+              <Route 
+                path="/add-product" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <AddProduct />
                   </motion.div>
                 } 
               />

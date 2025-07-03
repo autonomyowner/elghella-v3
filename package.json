@@ -18,7 +18,7 @@
     "@reduxjs/toolkit": "^2.4.0",
     "@stripe/react-stripe-js": "^3.7.0",
     "@supabase/realtime-js": "^2.12.0",
-    "@supabase/supabase-js": "^2.50.2",
+    "@supabase/supabase-js": "^2.50.3",
     "@tanstack/react-query": "^5.62.3",
     "@tanstack/react-query-devtools": "^5.81.5",
     "@tanstack/react-table": "^8.21.3",

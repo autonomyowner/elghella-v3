@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../lib/supabase";
 
 class AuthService {
   async login(data: { email: string; password: string }) {
