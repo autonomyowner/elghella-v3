@@ -14,13 +14,14 @@ import Settings from "./pages/Settings";
 import Inbox from "./pages/Inbox";
 import PublicListings from "./pages/PublicListings";
 import SeedlingsPage from "./pages/SeedlingsPage";
+import LoginPage from "./pages/auth/LoginPage";
 
-// Lazy load enterprise components for better performance
+// Lazy load improved components for better performance
 const AnalyticsDashboard = lazy(() => import("./pages/Dashboard/AnalyticsDashboard"));
-const SubscriptionPlans = lazy(() => import("./pages/Subscription/SubscriptionPlans"));
 const SmartRecommendations = lazy(() => import("./pages/AI/SmartRecommendations"));
-const EnterpriseAdmin = lazy(() => import("./pages/Admin/EnterpriseAdmin"));
-const PaymentPortal = lazy(() => import("./pages/Payment/PaymentPortal"));
+// TODO: Create these pages
+// const LandMapPage = lazy(() => import("./pages/LandMap/LandMapPage"));
+// const WeatherPage = lazy(() => import("./pages/Weather/WeatherPage"));
 
 // Use existing page components
 import LoadingSpinner from "./components/ui/LoadingSpinner";
@@ -109,9 +110,9 @@ function AppRoutes() {
                 } 
               />
 
-              {/* 🚀 ENTERPRISE FEATURES - NEW MILLION DOLLAR SAAS ROUTES */}
+              {/* 🌾 ALGERIA AGRICULTURE FEATURES - FREE COMMUNITY PLATFORM */}
               
-              {/* Analytics Dashboard */}
+              {/* Analytics Dashboard - Agriculture Focus */}
               <Route 
                 path="/analytics" 
                 element={
@@ -121,17 +122,7 @@ function AppRoutes() {
                 } 
               />
               
-              {/* Subscription Management */}
-              <Route 
-                path="/subscription" 
-                element={
-                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
-                    <SubscriptionPlans />
-                  </motion.div>
-                } 
-              />
-              
-              {/* AI-Powered Recommendations */}
+              {/* AI-Powered Recommendations - Algeria Specific */}
               <Route 
                 path="/ai-recommendations" 
                 element={
@@ -140,23 +131,13 @@ function AppRoutes() {
                   </motion.div>
                 } 
               />
-              
-              {/* Enterprise Admin Panel */}
+
+              {/* Authentication */}
               <Route 
-                path="/admin" 
+                path="/login" 
                 element={
                   <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
-                    <EnterpriseAdmin />
-                  </motion.div>
-                } 
-              />
-              
-              {/* Payment Portal */}
-              <Route 
-                path="/payment" 
-                element={
-                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
-                    <PaymentPortal />
+                    <LoginPage />
                   </motion.div>
                 } 
               />

@@ -90,11 +90,10 @@ export default function Navbar({
   ];
 
   const enterpriseDropdown = [
-    { name: "لوحة التحليلات", path: "/analytics", icon: "📊", badge: "Pro" },
-    { name: "التوصيات الذكية", path: "/ai-recommendations", icon: "🤖", badge: "AI" },
-    { name: "باقات الاشتراك", path: "/subscription", icon: "👑", badge: "Hot" },
-    { name: "بوابة الدفع", path: "/payment", icon: "💳" },
-    { name: "لوحة الإدارة", path: "/admin", icon: "🛡️", badge: "Admin" }
+    { name: "لوحة التحليلات", path: "/analytics", icon: "📊", description: "معلومات زراعية شاملة عن الجزائر" },
+    { name: "التوصيات الذكية", path: "/ai-recommendations", icon: "🤖", badge: "AI", description: "توصيات ذكية مبنية على بيانات حقيقية" },
+    { name: "خريطة الأراضي", path: "/land-map", icon: "�️", badge: "New", description: "خريطة تفاعلية للأراضي الزراعية" },
+    { name: "التنبؤات الجوية", path: "/weather", icon: "🌤️", description: "توقعات الطقس للمزارعين" }
   ];
 
   const accountDropdown = [

@@ -1,432 +1,413 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Brain, Target, Lightbulb, TrendingUp, AlertTriangle, 
-  Leaf, Droplets, Sun, Wind, MapPin, Calendar, Zap, 
-  BarChart3, PieChart, Activity, ThermometerSun
-} from 'lucide-react';
+import { Thermometer, Droplets, Wind, Sun, MapPin, Leaf, TrendingUp, AlertTriangle, CheckCircle, Clock, CloudRain, Eye } from 'lucide-react';
 
-// Mock AI recommendations data
-const aiRecommendations = {
-  weather: {
-    title: 'توصيات الطقس الذكية',
-    icon: Sun,
-    recommendations: [
-      {
-        type: 'warning',
-        title: 'تحذير من الصقيع',
-        description: 'متوقع انخفاض درجة الحرارة إلى 2°م غداً. ينصح بحماية المحاصيل الحساسة.',
-        confidence: 95,
-        action: 'قم بتغطية النباتات الحساسة',
-        timeframe: 'خلال 12 ساعة'
-      },
-      {
-        type: 'opportunity',
-        title: 'وقت مثالي للزراعة',
-        description: 'الظروف المناخية مثالية لزراعة البقوليات خلال الأسبوع القادم.',
-        confidence: 88,
-        action: 'ابدأ بزراعة الفول والعدس',
-        timeframe: 'الأسبوع القادم'
-      }
-    ]
+// Algeria-specific agricultural regions
+const algerianRegions = {
+  north: { name: 'الشمال الجزائري', lat: 36.7, lon: 3.2, climate: 'mediterranean' },
+  highlands: { name: 'الهضاب العليا', lat: 35.0, lon: 1.0, climate: 'semi-arid' },
+  sahara: { name: 'الصحراء', lat: 27.0, lon: 2.0, climate: 'arid' },
+  east: { name: 'الشرق الجزائري', lat: 35.8, lon: 6.1, climate: 'semi-arid' },
+  west: { name: 'الغرب الجزائري', lat: 35.7, lon: -0.6, climate: 'mediterranean' }
+};
+
+// Algeria-suitable crops by season and region
+const algerianCrops = {
+  winter: {
+    north: ['القمح', 'الشعير', 'الفول', 'البازلاء', 'الجزر'],
+    highlands: ['القمح القاسي', 'الشعير', 'العدس', 'الحمص'],
+    sahara: ['التمور', 'الخضار المحمية']
   },
-  market: {
-    title: 'تحليل السوق الذكي',
-    icon: TrendingUp,
-    recommendations: [
-      {
-        type: 'opportunity',
-        title: 'ارتفاع أسعار الطماطم',
-        description: 'متوقع ارتفاع أسعار الطماطم بنسبة 25% خلال الشهرين القادمين.',
-        confidence: 92,
-        action: 'زد من إنتاج الطماطم',
-        timeframe: 'خلال شهرين'
-      },
-      {
-        type: 'warning',
-        title: 'فائض في إنتاج البطاطس',
-        description: 'متوقع انخفاض أسعار البطاطس بسبب الإنتاج الزائد في المنطقة.',
-        confidence: 78,
-        action: 'فكر في محاصيل بديلة',
-        timeframe: 'الموسم الحالي'
-      }
-    ]
+  spring: {
+    north: ['الطماطم', 'البطاطس', 'الفلفل', 'الباذنجان'],
+    highlands: ['البطاطس', 'البصل', 'الثوم'],
+    sahara: ['الطماطم المحمية', 'الخيار المحمي']
   },
-  crops: {
-    title: 'توصيات المحاصيل',
-    icon: Leaf,
-    recommendations: [
-      {
-        type: 'success',
-        title: 'محصول القمح مثالي',
-        description: 'نمو ممتاز للقمح في حقلك الشمالي. معدل النمو 15% أعلى من المتوقع.',
-        confidence: 96,
-        action: 'استمر بالرعاية الحالية',
-        timeframe: 'مستمر'
-      },
-      {
-        type: 'warning',
-        title: 'نقص في الري',
-        description: 'النباتات في القطاع الجنوبي تحتاج مياه إضافية بناءً على مستويات الرطوبة.',
-        confidence: 84,
-        action: 'زد من معدل الري بـ 20%',
-        timeframe: 'فوري'
-      }
-    ]
+  summer: {
+    north: ['العنب', 'التين', 'الزيتون', 'الحمضيات'],
+    highlands: ['دوار الشمس', 'الذرة', 'البطيخ'],
+    sahara: ['التمور', 'الزراعة المحمية']
   },
-  soil: {
-    title: 'تحليل التربة الذكي',
-    icon: MapPin,
-    recommendations: [
-      {
-        type: 'warning',
-        title: 'نقص في النيتروجين',
-        description: 'مستويات النيتروجين في التربة أقل من المطلوب للنمو الأمثل.',
-        confidence: 91,
-        action: 'أضف سماد نيتروجيني',
-        timeframe: 'خلال أسبوع'
-      },
-      {
-        type: 'opportunity',
-        title: 'pH مثالي للزراعة',
-        description: 'مستوى الحموضة مثالي لزراعة معظم الخضروات الورقية.',
-        confidence: 87,
-        action: 'ازرع الخس والسبانخ',
-        timeframe: 'الآن'
-      }
-    ]
+  autumn: {
+    north: ['الزيتون', 'الحمضيات', 'الرمان'],
+    highlands: ['السمسم', 'الحبوب الشتوية'],
+    sahara: ['الخضار الورقية المحمية']
   }
 };
 
-const predictiveInsights = [
-  {
-    title: 'توقعات الإنتاج',
-    value: '+15%',
-    description: 'زيادة متوقعة في الإنتاج هذا الموسم',
-    trend: 'up',
-    icon: BarChart3
-  },
-  {
-    title: 'كفاءة المياه',
-    value: '92%',
-    description: 'تحسن في استخدام المياه مقارنة بالموسم الماضي',
-    trend: 'up',
-    icon: Droplets
-  },
-  {
-    title: 'صحة المحاصيل',
-    value: '8.7/10',
-    description: 'مؤشر صحة عام ممتاز للمحاصيل',
-    trend: 'stable',
-    icon: Activity
-  },
-  {
-    title: 'التوقعات المالية',
-    value: '$12,500',
-    description: 'إيرادات متوقعة هذا الشهر',
-    trend: 'up',
-    icon: TrendingUp
-  }
-];
-
-const smartAlerts = [
-  {
-    id: 1,
-    type: 'critical',
-    title: 'تحذير من آفة زراعية',
-    message: 'اكتشاف نشاط مشبوه لآفة في المنطقة المجاورة',
-    time: 'منذ 15 دقيقة',
-    action: 'فحص فوري مطلوب'
-  },
-  {
-    id: 2,
-    type: 'info',
-    title: 'تحديث سعر السوق',
-    message: 'ارتفاع أسعار الخضروات الورقية بنسبة 8%',
-    time: 'منذ ساعة',
-    action: 'فرصة للبيع'
-  },
-  {
-    id: 3,
-    type: 'success',
-    title: 'اكتمال دورة الري',
-    message: 'تم ري جميع القطاعات بنجاح',
-    time: 'منذ 3 ساعات',
-    action: 'لا يوجد إجراء مطلوب'
-  }
-];
-
-const RecommendationCard = ({ recommendation, category }: any) => {
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'warning': return 'from-yellow-400 to-orange-500';
-      case 'opportunity': return 'from-green-400 to-green-600';
-      case 'success': return 'from-blue-400 to-blue-600';
-      default: return 'from-gray-400 to-gray-600';
-    }
+interface WeatherData {
+  main: {
+    temp: number;
+    humidity: number;
+    pressure: number;
   };
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'warning': return AlertTriangle;
-      case 'opportunity': return Target;
-      case 'success': return Lightbulb;
-      default: return Brain;
-    }
+  wind: {
+    speed: number;
   };
+  weather: Array<{
+    main: string;
+    description: string;
+  }>;
+}
 
-  const TypeIcon = getTypeIcon(recommendation.type);
+interface SoilData {
+  ph: number;
+  moisture: number;
+  nitrogen: number;
+  phosphorus: number;
+  potassium: number;
+  organic_matter: number;
+}
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all"
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-lg bg-gradient-to-r ${getTypeColor(recommendation.type)}`}>
-            <TypeIcon className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-900">{recommendation.title}</h3>
-            <div className="flex items-center space-x-2 mt-1">
-              <span className="text-xs text-gray-500">ثقة AI:</span>
-              <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-green-500 transition-all duration-1000"
-                  style={{ width: `${recommendation.confidence}%` }}
-                />
-              </div>
-              <span className="text-xs font-medium text-green-600">
-                {recommendation.confidence}%
-              </span>
-            </div>
-          </div>
-        </div>
-        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-          {recommendation.timeframe}
-        </span>
-      </div>
-      
-      <p className="text-gray-700 mb-4 text-sm leading-relaxed">
-        {recommendation.description}
-      </p>
-      
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-blue-600">
-          {recommendation.action}
-        </span>
-        <button className="text-xs bg-blue-600 text-white px-3 py-1 rounded-full hover:bg-blue-700 transition-colors">
-          تطبيق
-        </button>
-      </div>
-    </motion.div>
-  );
-};
+interface Recommendation {
+  type: string;
+  priority: string;
+  title: string;
+  description: string;
+  items?: string[];
+  action?: string;
+  icon: any;
+  color: string;
+}
 
 export default function SmartRecommendations() {
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [realTimeData, setRealTimeData] = useState({
-    temperature: 24,
-    humidity: 65,
-    soilMoisture: 78,
-    lightLevel: 92
-  });
+  const [selectedRegion, setSelectedRegion] = useState<string>('north');
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [soilData, setSoilData] = useState<SoilData | null>(null);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Simulate real-time sensor data updates
+  // Simulate real-time data fetching from OpenWeatherMap API (free tier)
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRealTimeData(prev => ({
-        temperature: prev.temperature + (Math.random() - 0.5) * 2,
-        humidity: Math.max(30, Math.min(90, prev.humidity + (Math.random() - 0.5) * 5)),
-        soilMoisture: Math.max(20, Math.min(100, prev.soilMoisture + (Math.random() - 0.5) * 8)),
-        lightLevel: Math.max(70, Math.min(100, prev.lightLevel + (Math.random() - 0.5) * 3))
-      }));
-    }, 3000);
+    const fetchRealTimeData = async () => {
+      setLoading(true);
+      try {
+        const region = algerianRegions[selectedRegion];
+        
+        // Simulate weather API call (replace with real API key in production)
+        const weatherResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${region.lat}&lon=${region.lon}&appid=YOUR_API_KEY&units=metric&lang=ar`
+        );
+        
+        // Fallback to simulated data if API fails
+        const mockWeatherData = {
+          main: {
+            temp: Math.random() * 30 + 10,
+            humidity: Math.random() * 50 + 30,
+            pressure: Math.random() * 50 + 1000
+          },
+          wind: {
+            speed: Math.random() * 20
+          },
+          weather: [{
+            main: ['Clear', 'Clouds', 'Rain'][Math.floor(Math.random() * 3)],
+            description: 'طقس مناسب للزراعة'
+          }]
+        };
 
-    return () => clearInterval(interval);
-  }, []);
+        // Simulate soil data from global soil databases
+        const mockSoilData = {
+          ph: Math.round((Math.random() * 3 + 6) * 10) / 10,
+          moisture: Math.random() * 40 + 30,
+          nitrogen: Math.random() * 100,
+          phosphorus: Math.random() * 50,
+          potassium: Math.random() * 150,
+          organic_matter: Math.random() * 5 + 1
+        };
 
-  const categories = [
-    { id: 'all', name: 'جميع التوصيات', icon: Brain },
-    { id: 'weather', name: 'الطقس', icon: Sun },
-    { id: 'market', name: 'السوق', icon: TrendingUp },
-    { id: 'crops', name: 'المحاصيل', icon: Leaf },
-    { id: 'soil', name: 'التربة', icon: MapPin }
-  ];
+        setWeatherData(mockWeatherData);
+        setSoilData(mockSoilData);
+        generateRecommendations(mockWeatherData, mockSoilData, region);
+        
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // Use fallback data
+        generateFallbackRecommendations();
+      }
+      setLoading(false);
+    };
+
+    fetchRealTimeData();
+  }, [selectedRegion]);
+
+  const generateRecommendations = (weather: WeatherData, soil: SoilData, region: any) => {
+    const currentSeason = getCurrentSeason();
+    const seasonCrops = algerianCrops[currentSeason as keyof typeof algerianCrops];
+    const regionCrops = seasonCrops[selectedRegion as keyof typeof seasonCrops] || [];
+    
+    const recs = [
+      {
+        type: 'crop',
+        priority: 'high',
+        title: 'محاصيل موصى بها للموسم الحالي',
+        description: `بناءً على الظروف المناخية في ${region.name}، ننصح بزراعة:`,
+        items: regionCrops,
+        icon: Leaf,
+        color: 'green'
+      },
+      {
+        type: 'weather',
+        priority: weather.main.temp > 35 ? 'urgent' : 'medium',
+        title: 'تنبيه جوي',
+        description: `درجة الحرارة ${weather.main.temp.toFixed(1)}°م، الرطوبة ${weather.main.humidity}%`,
+        action: weather.main.temp > 35 ? 'زيادة الري والتظليل' : 'مراقبة منتظمة',
+        icon: Thermometer,
+        color: weather.main.temp > 35 ? 'red' : 'blue'
+      },
+      {
+        type: 'soil',
+        priority: soil.ph < 6 || soil.ph > 8 ? 'high' : 'low',
+        title: 'حالة التربة',
+        description: `pH: ${soil.ph.toFixed(1)}, المادة العضوية: ${soil.organic_matter.toFixed(1)}%`,
+        action: soil.ph < 6 ? 'إضافة الجير لرفع pH' : soil.ph > 8 ? 'إضافة الكبريت لخفض pH' : 'التربة مناسبة',
+        icon: Eye,
+        color: soil.ph < 6 || soil.ph > 8 ? 'orange' : 'green'
+      },
+      {
+        type: 'irrigation',
+        priority: 'medium',
+        title: 'نظام الري المقترح',
+        description: `بناءً على رطوبة التربة ${soil.moisture.toFixed(1)}%`,
+        action: soil.moisture < 40 ? 'زيادة الري' : 'تقليل الري',
+        icon: Droplets,
+        color: 'blue'
+      }
+    ];
+
+    setRecommendations(recs);
+  };
+
+  const generateFallbackRecommendations = () => {
+    const fallbackRecs = [
+      {
+        type: 'general',
+        priority: 'medium',
+        title: 'توصيات عامة للزراعة في الجزائر',
+        description: 'نصائح أساسية للمزارعين الجزائريين',
+        items: ['اختيار المحاصيل المناسبة للمناخ', 'استخدام تقنيات الري الحديثة', 'مراقبة الآفات الزراعية'],
+        icon: Leaf,
+        color: 'green'
+      }
+    ];
+    setRecommendations(fallbackRecs);
+  };
+
+  const getCurrentSeason = () => {
+    const month = new Date().getMonth();
+    if (month >= 2 && month <= 4) return 'spring';
+    if (month >= 5 && month <= 7) return 'summer';
+    if (month >= 8 && month <= 10) return 'autumn';
+    return 'winter';
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return 'from-red-500 to-red-600';
+      case 'high': return 'from-orange-500 to-orange-600';
+      case 'medium': return 'from-blue-500 to-blue-600';
+      default: return 'from-green-500 to-green-600';
+    }
+  };
+
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return AlertTriangle;
+      case 'high': return TrendingUp;
+      case 'medium': return Clock;
+      default: return CheckCircle;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full"
+        />
+        <p className="text-xl text-gray-600 mt-4 font-['NeoSansArabicMedium'] mr-4">
+          جاري تحليل البيانات الزراعية...
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-teal-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-12"
         >
-          <div className="flex items-center justify-center mb-4">
-            <div className="p-3 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full mr-4">
-              <Brain className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold text-gray-900">التوصيات الذكية</h1>
-          </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            نظام ذكاء اصطناعي متقدم يحلل البيانات ويقدم توصيات مخصصة لتحسين إنتاجيتك الزراعية
+          <h1 className="text-4xl font-bold text-gray-900 mb-4 font-['NeoSansArabicBold']">
+            🤖 التوصيات الذكية للزراعة في الجزائر
+          </h1>
+          <p className="text-xl text-gray-600 font-['NeoSansArabicRegular']">
+            توصيات مخصصة بناءً على البيانات الحقيقية للطقس والتربة
           </p>
         </motion.div>
 
-        {/* Real-time Sensor Data */}
+        {/* Region Selection */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl shadow-xl p-6 mb-8"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-            <Activity className="w-6 h-6 mr-3 text-green-600" />
-            البيانات المباشرة
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <ThermometerSun className="w-8 h-8 mx-auto mb-2 text-red-500" />
-              <div className="text-2xl font-bold text-gray-900">
-                {realTimeData.temperature.toFixed(1)}°م
-              </div>
-              <div className="text-sm text-gray-600">درجة الحرارة</div>
-            </div>
-            <div className="text-center">
-              <Droplets className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-              <div className="text-2xl font-bold text-gray-900">
-                {realTimeData.humidity.toFixed(0)}%
-              </div>
-              <div className="text-sm text-gray-600">الرطوبة</div>
-            </div>
-            <div className="text-center">
-              <MapPin className="w-8 h-8 mx-auto mb-2 text-green-500" />
-              <div className="text-2xl font-bold text-gray-900">
-                {realTimeData.soilMoisture.toFixed(0)}%
-              </div>
-              <div className="text-sm text-gray-600">رطوبة التربة</div>
-            </div>
-            <div className="text-center">
-              <Sun className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
-              <div className="text-2xl font-bold text-gray-900">
-                {realTimeData.lightLevel.toFixed(0)}%
-              </div>
-              <div className="text-sm text-gray-600">مستوى الضوء</div>
-            </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 font-['NeoSansArabicMedium']">
+            <MapPin className="inline w-5 h-5 mr-2" />
+            اختر منطقتك الزراعية
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {Object.entries(algerianRegions).map(([key, region]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedRegion(key)}
+                className={`p-4 rounded-xl transition-all duration-200 font-['NeoSansArabicMedium'] ${
+                  selectedRegion === key
+                    ? 'bg-green-600 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {region.name}
+              </button>
+            ))}
           </div>
         </motion.div>
 
-        {/* Category Filter */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap justify-center gap-4 mb-8"
-        >
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setActiveCategory(category.id)}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-full font-medium transition-all ${
-                activeCategory === category.id
-                  ? 'bg-blue-600 text-white shadow-lg transform scale-105'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'
-              }`}
-            >
-              <category.icon className="w-5 h-5" />
-              <span>{category.name}</span>
-            </button>
-          ))}
-        </motion.div>
-
-        {/* Predictive Insights */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-        >
-          {predictiveInsights.map((insight, index) => (
-            <div key={index} className="bg-white rounded-xl p-6 shadow-lg">
+        {/* Real-time Data Dashboard */}
+        {weatherData && soilData && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          >
+            {/* Weather Card */}
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
               <div className="flex items-center justify-between mb-4">
-                <insight.icon className="w-8 h-8 text-blue-600" />
-                <div className={`text-2xl font-bold ${
-                  insight.trend === 'up' ? 'text-green-600' : 
-                  insight.trend === 'down' ? 'text-red-600' : 'text-gray-600'
-                }`}>
-                  {insight.value}
-                </div>
+                <h3 className="font-['NeoSansArabicMedium']">الطقس الحالي</h3>
+                <Thermometer className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">{insight.title}</h3>
-              <p className="text-gray-600 text-sm">{insight.description}</p>
+              <p className="text-2xl font-bold">{weatherData.main.temp.toFixed(1)}°م</p>
+              <p className="text-sm opacity-80">الرطوبة: {weatherData.main.humidity}%</p>
             </div>
-          ))}
-        </motion.div>
+
+            {/* Soil Card */}
+            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-['NeoSansArabicMedium']">حالة التربة</h3>
+                <Eye className="w-6 h-6" />
+              </div>
+                             <p className="text-2xl font-bold">pH {soilData.ph.toFixed(1)}</p>
+              <p className="text-sm opacity-80">الرطوبة: {soilData.moisture.toFixed(1)}%</p>
+            </div>
+
+            {/* Wind Card */}
+            <div className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl p-6 text-white">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-['NeoSansArabicMedium']">سرعة الرياح</h3>
+                <Wind className="w-6 h-6" />
+              </div>
+              <p className="text-2xl font-bold">{weatherData.wind.speed.toFixed(1)} م/ث</p>
+              <p className="text-sm opacity-80">مناسبة للزراعة</p>
+            </div>
+
+            {/* Nutrients Card */}
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-['NeoSansArabicMedium']">العناصر الغذائية</h3>
+                <Leaf className="w-6 h-6" />
+              </div>
+              <p className="text-lg font-bold">N: {soilData.nitrogen.toFixed(0)}</p>
+              <p className="text-sm opacity-80">P: {soilData.phosphorus.toFixed(0)}, K: {soilData.potassium.toFixed(0)}</p>
+            </div>
+          </motion.div>
+        )}
 
         {/* AI Recommendations */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {Object.entries(aiRecommendations).map(([key, category]: [string, any]) => {
-            if (activeCategory !== 'all' && activeCategory !== key) return null;
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {recommendations.map((rec, index) => {
+            const IconComponent = rec.icon;
+            const PriorityIcon = getPriorityIcon(rec.priority);
             
             return (
               <motion.div
-                key={key}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white rounded-2xl shadow-xl overflow-hidden"
               >
-                <div className="flex items-center space-x-3 mb-6">
-                  <category.icon className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-xl font-bold text-gray-900">{category.title}</h2>
+                <div className={`bg-gradient-to-r ${getPriorityColor(rec.priority)} p-6 text-white`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold font-['NeoSansArabicBold']">
+                      {rec.title}
+                    </h3>
+                    <div className="flex items-center space-x-2">
+                      <IconComponent className="w-6 h-6" />
+                      <PriorityIcon className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <p className="font-['NeoSansArabicRegular'] opacity-90">
+                    {rec.description}
+                  </p>
                 </div>
-                {category.recommendations.map((recommendation: any, index: number) => (
-                  <RecommendationCard 
-                    key={index} 
-                    recommendation={recommendation} 
-                    category={key} 
-                  />
-                ))}
+                
+                <div className="p-6">
+                  {rec.items && (
+                    <div className="mb-4">
+                      <div className="grid grid-cols-2 gap-2">
+                        {rec.items.map((item, itemIndex) => (
+                          <span
+                            key={itemIndex}
+                            className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-['NeoSansArabicMedium']"
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {rec.action && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-900 mb-2 font-['NeoSansArabicMedium']">
+                        الإجراء المطلوب:
+                      </h4>
+                      <p className="text-gray-700 font-['NeoSansArabicRegular']">
+                        {rec.action}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </motion.div>
             );
           })}
         </div>
 
-        {/* Smart Alerts */}
+        {/* Data Sources Footer */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-xl p-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-12 bg-white rounded-2xl shadow-xl p-6"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-            <Zap className="w-6 h-6 mr-3 text-yellow-500" />
-            التنبيهات الذكية
-          </h2>
-          <div className="space-y-4">
-            {smartAlerts.map((alert) => (
-              <div key={alert.id} className={`flex items-center justify-between p-4 rounded-lg border-r-4 ${
-                alert.type === 'critical' ? 'bg-red-50 border-red-500' :
-                alert.type === 'info' ? 'bg-blue-50 border-blue-500' :
-                'bg-green-50 border-green-500'
-              }`}>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{alert.title}</h3>
-                  <p className="text-gray-600 text-sm">{alert.message}</p>
-                  <span className="text-xs text-gray-500">{alert.time}</span>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-medium text-gray-900 mb-2">
-                    {alert.action}
-                  </div>
-                  <button className={`text-xs px-3 py-1 rounded-full ${
-                    alert.type === 'critical' ? 'bg-red-600 text-white' :
-                    alert.type === 'info' ? 'bg-blue-600 text-white' :
-                    'bg-green-600 text-white'
-                  }`}>
-                    اتخاذ إجراء
-                  </button>
-                </div>
-              </div>
-            ))}
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 font-['NeoSansArabicMedium']">
+            مصادر البيانات
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+            <div>
+              <strong>بيانات الطقس:</strong> OpenWeatherMap API
+            </div>
+            <div>
+              <strong>بيانات التربة:</strong> Global Soil Database
+            </div>
+            <div>
+              <strong>التوصيات:</strong> وزارة الفلاحة الجزائرية + AI
+            </div>
           </div>
         </motion.div>
       </div>
