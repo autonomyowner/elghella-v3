@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { navigationLinks } from "../config/NavigationConfig";
+import { navigationConfig } from "../config/NavigationConfig";
 import Logo from "../assets/logo.svg";
 import { useAuth } from "../context/AuthContext";
 import UserMenu from "../components/DropdownUser";
@@ -129,10 +129,10 @@ export default function Navbar({
               isRTL ? "right-1/2 translate-x-1/2" : "left-1/2 -translate-x-1/2"
             } hidden md:flex space-x-6`}
           >
-            {navigationLinks.map((link) => (
-              <button
-                key={link.href}
-                onClick={() => handleNavigation(link.href)}
+            {navigationConfig.map((link) => (
+                              <button
+                  key={link.path}
+                  onClick={() => handleNavigation(link.path)}
                 className={`
                   font-['NeoSansArabicMedium']
                   transition-colors duration-300

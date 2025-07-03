@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { navigationLinks } from "../config/NavigationConfig";
+import { navigationConfig } from "../config/NavigationConfig";
 import { useAuth } from "../context/AuthContext";
 
 export default function Sidebar({
@@ -167,10 +167,10 @@ export default function Sidebar({
         </button>
 
         {/* Sidebar Links */}
-        {navigationLinks.map((link) => (
-          <button
-            key={link.href}
-            onClick={() => handleNavigation(link.href)}
+        {navigationConfig.map((link) => (
+                      <button
+              key={link.path}
+              onClick={() => handleNavigation(link.path)}
             className="text-lg text-gray-300 hover:bg-gray-700 px-4 py-2 rounded-lg w-full text-right font-['NeoSansArabicMedium']"
           >
             {link.name}

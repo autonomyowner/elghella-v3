@@ -23,7 +23,6 @@ const EnterpriseAdmin = lazy(() => import("./pages/Admin/EnterpriseAdmin"));
 const PaymentPortal = lazy(() => import("./pages/Payment/PaymentPortal"));
 
 // Use existing page components
-import Footer from "./pages/Footer";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
 
 // Loading component for enterprise features
