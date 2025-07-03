@@ -7,7 +7,7 @@ import UserMenu from "../components/DropdownUser";
 import DropdownAdd from "../components/DropdownAdd";
 import { AiOutlineMenu, AiOutlinePlus } from "react-icons/ai";
 import { FaBoxArchive } from "react-icons/fa6";
-import { LogIn } from "lucide-react";
+import { LogIn, ChevronDown } from "lucide-react";
 
 export default function Navbar({
   toggleSidebar,
@@ -19,6 +19,7 @@ export default function Navbar({
   isRTL?: boolean;
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -35,6 +36,9 @@ export default function Navbar({
   }, []);
 
   const handleNavigation = (href: string) => {
+    // Close any open dropdown
+    setOpenDropdown(null);
+    
     // If href starts with '/', navigate directly
     if (href.startsWith('/')) {
       if (location.pathname !== href) {
@@ -71,13 +75,96 @@ export default function Navbar({
     }
   }, [location]);
 
+  // Grouped navigation items
+  const mainItems = [
+    { name: "الرئيسية", path: "/" },
+    { name: "معرض الصور", path: "/gallery" }
+  ];
+
+  const servicesDropdown = [
+    { name: "تأجير الأراضي", path: "/land-rent", icon: "🌾" },
+    { name: "تأجير المعدات", path: "/machine-rent", icon: "🚜" },
+    { name: "المنتجات الزراعية", path: "/greengrocer", icon: "🥬" },
+    { name: "الخدمات الاستشارية", path: "/expertise", icon: "👨‍🌾" },
+    { name: "الشتلات والبذور", path: "/seedlings", icon: "🌱" }
+  ];
+
+  const enterpriseDropdown = [
+    { name: "لوحة التحليلات", path: "/analytics", icon: "📊", badge: "Pro" },
+    { name: "التوصيات الذكية", path: "/ai-recommendations", icon: "🤖", badge: "AI" },
+    { name: "باقات الاشتراك", path: "/subscription", icon: "👑", badge: "Hot" },
+    { name: "بوابة الدفع", path: "/payment", icon: "💳" },
+    { name: "لوحة الإدارة", path: "/admin", icon: "🛡️", badge: "Admin" }
+  ];
+
+  const accountDropdown = [
+    { name: "الملف الشخصي", path: "/profile", icon: "👤" },
+    { name: "الإعدادات", path: "/settings", icon: "⚙️" },
+    { name: "الرسائل", path: "/inbox", icon: "💬" },
+    { name: "القوائم العامة", path: "/public-listings", icon: "📋" }
+  ];
+
+  const toggleDropdown = (dropdown: string) => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setOpenDropdown(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  const DropdownMenu = ({ 
+    items, 
+    isOpen, 
+    onItemClick 
+  }: { 
+    items: any[], 
+    isOpen: boolean, 
+    onItemClick: (path: string) => void 
+  }) => (
+    <div className={`absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 transform transition-all duration-300 z-50 ${
+      isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+    }`}>
+      <div className="py-2">
+        {items.map((item, index) => (
+          <button
+            key={index}
+            onClick={(e) => {
+              e.stopPropagation();
+              onItemClick(item.path);
+            }}
+            className="w-full text-right px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors duration-200 flex items-center justify-between group"
+          >
+            <div className="flex items-center">
+              <span className="text-lg mr-3">{item.icon}</span>
+              <span className="font-['NeoSansArabicMedium']">{item.name}</span>
+            </div>
+            {item.badge && (
+              <span className={`px-2 py-1 text-xs rounded-full font-bold ${
+                item.badge === 'Pro' ? 'bg-blue-100 text-blue-600' :
+                item.badge === 'AI' ? 'bg-purple-100 text-purple-600' :
+                item.badge === 'Hot' ? 'bg-red-100 text-red-600' :
+                item.badge === 'Admin' ? 'bg-orange-100 text-orange-600' :
+                'bg-gray-100 text-gray-600'
+              }`}>
+                {item.badge}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <nav
       className={`fixed w-full top-0 z-50 transition-all duration-300 ease-in-out
       ${
         isScrolled
-          ? "bg-gray-800/80 backdrop-blur-md shadow-sm"
-          : "bg-transparent"
+          ? "bg-gray-800/95 backdrop-blur-md shadow-lg border-b border-gray-700/20"
+          : "bg-gray-800/80 backdrop-blur-sm"
       }
       ${isRTL ? "right-0" : "left-0"}
     `}
@@ -94,17 +181,7 @@ export default function Navbar({
           >
             <button
               onClick={toggleSidebar}
-              className={`
-                focus:outline-none 
-                focus:ring-2 
-                rounded-md
-                flex items-center justify-center
-                ${
-                  isScrolled
-                    ? "text-white focus:ring-white/50"
-                    : "text-white focus:ring-white/50"
-                }
-              `}
+              className="focus:outline-none focus:ring-2 rounded-md flex items-center justify-center text-white hover:text-green-400 focus:ring-white/50 transition-colors duration-200"
             >
               <AiOutlineMenu className="w-6 h-6" />
             </button>
@@ -114,160 +191,166 @@ export default function Navbar({
             <Link
               onClick={() => handleNavigation("hero")}
               to="/"
-              className={`
-                text-lg font-bold 
-                font-['NeoSansArabicBold']
-                ${isScrolled ? "text-white" : "text-white"}
-              `}
+              className="text-lg font-bold font-['NeoSansArabicBold'] text-white hover:text-green-400 transition-colors duration-200"
             >
               <img src={Logo} alt="Logo" className="h-10" />
             </Link>
           </div>
 
-          <div
-            className={`absolute transform ${
-              isRTL ? "right-1/2 translate-x-1/2" : "left-1/2 -translate-x-1/2"
-            } hidden md:flex space-x-6`}
-          >
-            {navigationConfig.map((link) => (
-                              <button
-                  key={link.path}
-                  onClick={() => handleNavigation(link.path)}
-                className={`
-                  font-['NeoSansArabicMedium']
-                  transition-colors duration-300
-                  ${
-                    isScrolled
-                      ? "text-white hover:text-gray-300 hover:border-gray-300"
-                      : "text-white hover:text-gray-200 hover:border-gray-200"
-                  }
-                  border-b-2 border-transparent 
-                  hover:border-current
-                  pb-1
-                `}
+          {/* MODERN DROPDOWN NAVIGATION */}
+          <div className={`absolute transform ${
+            isRTL ? "right-1/2 translate-x-1/2" : "left-1/2 -translate-x-1/2"
+          } hidden md:flex items-center space-x-6`}>
+            
+            {/* Main Navigation Items */}
+            {mainItems.map((item) => (
+              <button
+                key={item.path}
+                onClick={() => handleNavigation(item.path)}
+                className="font-['NeoSansArabicMedium'] text-white hover:text-green-400 transition-colors duration-200 px-3 py-2 rounded-md"
               >
-                {link.name}
+                {item.name}
               </button>
             ))}
-          </div>
 
-          <div className="ml-auto flex items-center space-x-4">
-            <div className="flex items-center space-x-4 md:space-x-6">
-              {/* Public Listings Link */}
-              <div className="flex items-center justify-center w-6 h-6">
-                <Link
-                  to="/publiclistings"
-                  className={`flex items-center justify-center w-full h-full text-green-400 hover:text-green-300 transition-colors duration-300 font-bold`}
-                  title="جميع العناصر العامة"
-                >
-                  <FaBoxArchive className="w-6 h-6" />
-                </Link>
-              </div>
-
-              {/* Unified User Icon with consistent wrapper */}
-              <div className="flex items-center justify-center w-6 h-6">
-                {!isAuthenticated ? (
-                  <Link
-                    to="/Login"
-                    className={`flex items-center justify-center w-full h-full text-white ${
-                      isScrolled ? "hover:text-gray-300" : "hover:text-gray-200"
-                    } transition-colors duration-300`}
-                  >
-                    <LogIn className="w-6 h-6" />
-                  </Link>
-                ) : (
-                  <div className="flex items-center justify-center w-full h-full">
-                    <UserMenu
-                      isScrolled={isScrolled}
-                      isRTL={isRTL}
-                      iconClassName="w-6 h-6"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Add Button with consistent wrapper */}
-              <div className="flex items-center justify-center w-6 h-6">
-                {isAuthenticated ? (
-                  <div className="flex items-center justify-center w-full h-full">
-                    <DropdownAdd
-                      isScrolled={isScrolled}
-                      isRTL={isRTL}
-                      iconClassName="w-6 h-6"
-                    />
-                  </div>
-                ) : (
-                  <Link
-                    to="/Login"
-                    className={`flex items-center justify-center w-full h-full text-white ${
-                      isScrolled ? "hover:text-gray-300" : "hover:text-gray-200"
-                    } transition-colors duration-300`}
-                  >
-                    <AiOutlinePlus className="w-6 h-6" />
-                  </Link>
-                )}
-              </div>
-
-              <div className="flex items-center justify-center w-6 h-6">
-                {isAuthenticated && (
-                  <button
-                    onClick={() => navigate("/manage")}
-                    className={`flex items-center justify-center w-full h-full text-white ${
-                      isScrolled ? "hover:text-gray-300" : "hover:text-gray-200"
-                    } transition-colors duration-300`}
-                  >
-                    <FaBoxArchive className="w-6 h-6" />
-                  </button>
-                )}
-              </div>
-
-              {/* Inbox Link - Only for authenticated users */}
-              <div className="flex items-center justify-center w-6 h-6">
-                {isAuthenticated && (
-                  <Link
-                    to="/inbox"
-                    className={`flex items-center justify-center w-full h-full text-blue-400 hover:text-blue-300 transition-colors duration-300 font-bold`}
-                    title="صندوق الرسائل"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5H4.5a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-.659 1.591l-7.5 7.5a2.25 2.25 0 01-3.182 0l-7.5-7.5A2.25 2.25 0 012.25 6.993V6.75"
-                      />
-                    </svg>
-                  </Link>
-                )}
-              </div>
+            {/* Services Dropdown */}
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDropdown('services');
+                }}
+                className="font-['NeoSansArabicMedium'] text-white hover:text-green-400 transition-colors duration-200 px-3 py-2 rounded-md flex items-center"
+              >
+                الخدمات
+                <ChevronDown className={`w-4 h-4 ml-1 transition-transform duration-200 ${openDropdown === 'services' ? 'rotate-180' : ''}`} />
+              </button>
+              <DropdownMenu 
+                items={servicesDropdown} 
+                isOpen={openDropdown === 'services'} 
+                onItemClick={handleNavigation}
+              />
             </div>
 
-            {/* Mobile Menu Button - Only visible on mobile */}
-            <div className="md:hidden">
-              {!isSidebarOpen && (
+            {/* Enterprise Dropdown */}
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDropdown('enterprise');
+                }}
+                className="font-['NeoSansArabicMedium'] text-white hover:text-green-400 transition-colors duration-200 px-3 py-2 rounded-md flex items-center"
+              >
+                الحلول المتقدمة
+                <ChevronDown className={`w-4 h-4 ml-1 transition-transform duration-200 ${openDropdown === 'enterprise' ? 'rotate-180' : ''}`} />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+              </button>
+              <DropdownMenu 
+                items={enterpriseDropdown} 
+                isOpen={openDropdown === 'enterprise'} 
+                onItemClick={handleNavigation}
+              />
+            </div>
+
+            {/* Account Dropdown */}
+            {isAuthenticated && (
+              <div className="relative">
                 <button
-                  onClick={toggleSidebar}
-                  className={`
-                    focus:outline-none 
-                    focus:ring-2 
-                    rounded-md
-                    flex items-center justify-center
-                    ${
-                      isScrolled
-                        ? "text-white focus:ring-white/50"
-                        : "text-white focus:ring-white/50"
-                    }
-                  `}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleDropdown('account');
+                  }}
+                  className="font-['NeoSansArabicMedium'] text-white hover:text-green-400 transition-colors duration-200 px-3 py-2 rounded-md flex items-center"
                 >
-                  <AiOutlineMenu className="w-6 h-6" />
+                  حسابي
+                  <ChevronDown className={`w-4 h-4 ml-1 transition-transform duration-200 ${openDropdown === 'account' ? 'rotate-180' : ''}`} />
                 </button>
+                <DropdownMenu 
+                  items={accountDropdown} 
+                  isOpen={openDropdown === 'account'} 
+                  onItemClick={handleNavigation}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT SIDE ACTIONS */}
+          <div className="ml-auto flex items-center space-x-3">
+            
+            {/* Quick Access Icons */}
+            <div className="hidden md:flex items-center space-x-3">
+              
+              {/* Public Listings */}
+              <Link
+                to="/public-listings"
+                className="p-2 text-green-400 hover:text-green-300 hover:bg-green-400/10 rounded-lg transition-all duration-200"
+                title="القوائم العامة"
+              >
+                <FaBoxArchive className="w-5 h-5" />
+              </Link>
+
+              {/* Analytics Dashboard */}
+              <Link
+                to="/analytics"
+                className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 rounded-lg transition-all duration-200"
+                title="لوحة التحليلات"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/>
+                  <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/>
+                </svg>
+              </Link>
+
+              {/* AI Recommendations */}
+              <Link
+                to="/ai-recommendations"
+                className="p-2 text-purple-400 hover:text-purple-300 hover:bg-purple-400/10 rounded-lg transition-all duration-200 relative"
+                title="التوصيات الذكية"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd"/>
+                </svg>
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
+              </Link>
+            </div>
+
+            {/* User Authentication */}
+            <div className="flex items-center">
+              {!isAuthenticated ? (
+                <Link
+                  to="/Login"
+                  className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 font-['NeoSansArabicMedium']"
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  تسجيل الدخول
+                </Link>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  {/* Add Button */}
+                  <DropdownAdd
+                    isScrolled={isScrolled}
+                    isRTL={isRTL}
+                    iconClassName="w-5 h-5"
+                  />
+                  
+                  {/* User Menu */}
+                  <UserMenu
+                    isScrolled={isScrolled}
+                    isRTL={isRTL}
+                    iconClassName="w-5 h-5"
+                  />
+                </div>
               )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <button
+                onClick={toggleSidebar}
+                className="p-2 text-white hover:text-green-400 hover:bg-white/10 rounded-lg transition-all duration-200"
+              >
+                <AiOutlineMenu className="w-6 h-6" />
+              </button>
             </div>
           </div>
         </div>
