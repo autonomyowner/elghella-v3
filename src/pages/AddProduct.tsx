@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Upload, MapPin, DollarSign, Package, Tag, Camera, FileText } from 'lucide-react';
+import { Plus, DollarSign, Package, Tag, Camera } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import Button from '../components/ui/Button';
 
 const categories = [
-  { id: 'land', name: 'الأراضي الزراعية', icon: '🌾' },
-  { id: 'equipment', name: 'المعدات الزراعية', icon: '🚜' },
-  { id: 'products', name: 'المنتجات الزراعية', icon: '🥬' },
+  { id: 'land', name: 'الأراضي الزراعية', icon: '🌾', popular: true },
+  { id: 'equipment', name: 'المعدات والجرارات', icon: '🚜', popular: true },
+  { id: 'trucks', name: 'الشاحنات والنقل', icon: '🚛', popular: true },
+  { id: 'products', name: 'المنتجات الزراعية', icon: '🥬', popular: true },
   { id: 'seeds', name: 'البذور والشتلات', icon: '🌱' },
   { id: 'fertilizer', name: 'الأسمدة والمبيدات', icon: '🧪' },
-  { id: 'tools', name: 'الأدوات الزراعية', icon: '🔧' },
+  { id: 'tools', name: 'الأدوات اليدوية', icon: '🔧' },
   { id: 'livestock', name: 'الماشية والدواجن', icon: '🐄' },
-  { id: 'services', name: 'الخدمات الزراعية', icon: '👨‍🌾' }
+  { id: 'services', name: 'الخدمات الزراعية', icon: '👨‍🌾' },
+  { id: 'storage', name: 'المخازن والتخزين', icon: '🏢' },
+  { id: 'irrigation', name: 'أنظمة الري', icon: '💧' },
+  { id: 'other', name: 'أخرى', icon: '📦' }
 ];
 
 const algerianRegions = [
@@ -111,58 +115,151 @@ export default function AddProduct() {
       // Basic validation
       if (!formData.title || !formData.description || !formData.category || !formData.price) {
         toast.error('يرجى ملء جميع الحقول المطلوبة');
+        setLoading(false);
         return;
       }
 
+      toast.loading('جاري رفع الصور...', { id: 'upload' });
+
       // Upload images to Supabase storage
       const imageUrls = [];
-      for (const image of formData.images) {
-        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}_${image.name}`;
-        const { data, error } = await supabase.storage
-          .from('product-images')
-          .upload(fileName, image);
+      
+      if (formData.images.length > 0) {
+        for (const image of formData.images) {
+          const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}_${image.name}`;
+          
+          try {
+            const { error } = await supabase.storage
+              .from('product-images')
+              .upload(fileName, image);
 
-        if (error) {
-          console.error('Image upload error:', error);
-          continue; // Skip this image but continue with others
+            if (error) {
+              console.error('Image upload error:', error);
+              // If bucket doesn't exist, create it or continue without images
+              console.warn('تعذر رفع الصورة، سيتم النشر بدون صور');
+              continue;
+            }
+
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+              .from('product-images')
+              .getPublicUrl(fileName);
+            
+            imageUrls.push(publicUrl);
+          } catch (imgError) {
+            console.error('Image processing error:', imgError);
+            continue;
+          }
         }
+      }
 
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(fileName);
+      toast.dismiss('upload');
+      toast.loading('جاري نشر المنتج...', { id: 'create' });
+
+      // Prepare product data
+      const productData = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        category: formData.category,
+        type: formData.type,
+        price: parseFloat(formData.price),
+        location: formData.location || null,
+        contact_phone: formData.contact_phone || null,
+        images: imageUrls.length > 0 ? imageUrls : null,
+        user_id: user?.userId,
+        user_email: user?.email,
+        status: 'active',
+        created_at: new Date().toISOString()
+      };
+
+      console.log('Submitting product data:', productData);
+
+      // Insert product data - try different table names as fallback
+      let insertResult = null;
+      let tableUsed = '';
+
+      // Try marketplace_items first
+      try {
+        const { data, error } = await supabase
+          .from('marketplace_items')
+          .insert(productData);
         
-        imageUrls.push(publicUrl);
+        if (!error) {
+          insertResult = data;
+          tableUsed = 'marketplace_items';
+        } else {
+          throw error;
+        }
+      } catch (firstError) {
+        console.log('marketplace_items table not found, trying products...');
+        
+        // Fallback to products table
+        try {
+          const { data, error } = await supabase
+            .from('products')
+            .insert(productData);
+          
+          if (!error) {
+            insertResult = data;
+            tableUsed = 'products';
+          } else {
+            throw error;
+          }
+        } catch (secondError) {
+          console.log('products table not found, trying listings...');
+          
+          // Fallback to listings table
+          const { data, error } = await supabase
+            .from('listings')
+            .insert(productData);
+          
+          if (error) {
+            throw error;
+          }
+          
+          insertResult = data;
+          tableUsed = 'listings';
+        }
       }
 
-      // Insert product data
-      const { data, error } = await supabase
-        .from('marketplace_items')
-        .insert({
-          title: formData.title,
-          description: formData.description,
-          category: formData.category,
-          type: formData.type,
-          price: parseFloat(formData.price),
-          location: formData.location,
-          contact_phone: formData.contact_phone,
-          images: imageUrls,
-          user_id: user?.userId,
-          user_email: user?.email,
-          status: 'active',
-          created_at: new Date().toISOString()
-        });
+      toast.dismiss('create');
+      toast.success(`تم نشر ${formData.type === 'sale' ? 'منتجك للبيع' : 'منتجك للإيجار'} بنجاح!`);
+      
+      console.log(`Product inserted successfully into ${tableUsed}:`, insertResult);
 
-      if (error) {
-        throw error;
-      }
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        category: '',
+        type: 'sale',
+        price: '',
+        location: '',
+        contact_phone: '',
+        images: []
+      });
+      setImagePreview([]);
 
-      toast.success('تم إضافة المنتج بنجاح!');
-      navigate('/public-listings');
+      // Navigate to listings after short delay
+      setTimeout(() => {
+        navigate('/public-listings');
+      }, 1500);
 
     } catch (error: any) {
       console.error('Error adding product:', error);
-      toast.error('حدث خطأ أثناء إضافة المنتج: ' + (error.message || 'خطأ غير متوقع'));
+      toast.dismiss();
+      
+      let errorMessage = 'حدث خطأ غير متوقع';
+      
+      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        errorMessage = 'جدول قاعدة البيانات غير متوفر. يرجى التواصل مع الإدارة.';
+      } else if (error.message?.includes('permission')) {
+        errorMessage = 'ليس لديك صلاحية لإضافة منتجات. يرجى التواصل مع الإدارة.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error('فشل في نشر المنتج: ' + errorMessage);
     } finally {
       setLoading(false);
     }
@@ -181,12 +278,30 @@ export default function AddProduct() {
           <div className="flex items-center justify-center mb-4">
             <Plus className="w-8 h-8 text-green-600 mr-3" />
             <h1 className="text-3xl font-bold text-gray-900 font-['NeoSansArabicBold']">
-              إضافة منتج جديد
+              أضف إعلان جديد
             </h1>
           </div>
-          <p className="text-lg text-gray-600 font-['NeoSansArabicRegular']">
-            أضف منتجك أو خدمتك الزراعية إلى منصة الغلة
+          <p className="text-lg text-gray-600 font-['NeoSansArabicRegular'] mb-2">
+            أضف منتجاتك، معداتك، أراضيك، أو خدماتك إلى منصة الغلة
           </p>
+          <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
+            <div className="flex items-center">
+              <span className="text-green-600 mr-1">🌾</span>
+              <span>أراضي زراعية</span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-blue-600 mr-1">🚜</span>
+              <span>جرارات ومعدات</span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-orange-600 mr-1">🚛</span>
+              <span>شاحنات ونقل</span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-purple-600 mr-1">🥬</span>
+              <span>منتجات زراعية</span>
+            </div>
+          </div>
         </motion.div>
 
         {/* Form */}
@@ -241,7 +356,7 @@ export default function AddProduct() {
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 font-['NeoSansArabicMedium']">
-                عنوان المنتج *
+                عنوان الإعلان *
               </label>
               <input
                 type="text"
@@ -249,30 +364,69 @@ export default function AddProduct() {
                 value={formData.title}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular']"
-                placeholder="مثال: أرض زراعية 5 هكتار في سطيف"
+                placeholder={
+                  formData.category === 'land' ? 'مثال: أرض زراعية 5 هكتار خصبة' :
+                  formData.category === 'equipment' ? 'مثال: جرار زراعي ماسي فيرغسون 2020' :
+                  formData.category === 'trucks' ? 'مثال: شاحنة نقل زراعي ايفيكو' :
+                  formData.category === 'products' ? 'مثال: طماطم طبيعية الموسم الجديد' :
+                  'مثال: اكتب عنوان واضح ومفصل'
+                }
                 required
               />
             </div>
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2 font-['NeoSansArabicMedium']">
-                الفئة *
+              <label className="block text-sm font-medium text-gray-700 mb-3 font-['NeoSansArabicMedium']">
+                الفئة * 
+                <span className="text-xs text-gray-500 font-normal"> - اختر نوع المنتج أو الخدمة</span>
               </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular']"
-                required
-              >
-                <option value="">اختر الفئة</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.icon} {cat.name}
-                  </option>
-                ))}
-              </select>
+              
+              {/* Popular Categories */}
+              <div className="mb-4">
+                <div className="text-sm text-gray-600 mb-2 font-['NeoSansArabicMedium']">الفئات الشائعة:</div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {categories.filter(cat => cat.popular).map(cat => (
+                    <label
+                      key={cat.id}
+                      className={`cursor-pointer border-2 rounded-lg p-3 text-center transition-all text-sm ${
+                        formData.category === cat.id
+                          ? 'border-green-500 bg-green-50 text-green-700'
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="category"
+                        value={cat.id}
+                        checked={formData.category === cat.id}
+                        onChange={handleInputChange}
+                        className="sr-only"
+                      />
+                      <div className="text-2xl mb-1">{cat.icon}</div>
+                      <div className="font-['NeoSansArabicMedium']">{cat.name}</div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* All Categories Dropdown */}
+              <div>
+                <div className="text-sm text-gray-600 mb-2 font-['NeoSansArabicMedium']">أو اختر من جميع الفئات:</div>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular']"
+                >
+                  <option value="">اختر الفئة</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.icon} {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Description */}

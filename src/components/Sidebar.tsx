@@ -187,13 +187,22 @@ export default function Sidebar({
           </button>
         )}
 
-        {/* Login/User Button with Truncated Email */}
-        <a
-          href={isAuthenticated ? "/profile" : "/login"}
-          className="text-lg text-gray-300 hover:bg-gray-700 px-4 py-2 rounded-lg mt-4 w-full text-right font-['NeoSansArabicMedium'] truncate"
-        >
-          {isAuthenticated ? truncateEmail(user?.email || "") : "تسجيل الدخول"}
-        </a>
+        {/* User Profile or Login Button */}
+        {isAuthenticated ? (
+          <button
+            onClick={() => { toggleSidebar(); navigate('/profile'); }}
+            className="text-lg text-green-400 hover:bg-gray-700 px-4 py-2 rounded-lg mt-4 w-full text-right font-['NeoSansArabicMedium'] truncate"
+          >
+            {truncateEmail(user?.email || "")}
+          </button>
+        ) : (
+          <button
+            onClick={() => { toggleSidebar(); navigate('/login'); }}
+            className="text-lg text-white hover:bg-green-600 px-4 py-2 rounded-lg mt-4 w-full text-center font-['NeoSansArabicMedium'] bg-green-500"
+          >
+            تسجيل الدخول
+          </button>
+        )}
       </div>
     </div>
   );

@@ -40,19 +40,21 @@ const DropdownAdd: React.FC<DropdownAddProps> = ({
       icon: AiOutlineApple,
       label: "إضافة منتج جديد",
       route: "/add-product",
-      description: "أضف منتجك إلى المنصة"
-    },
-    {
-      icon: PiFarm,
-      label: "قوائم المنتجات",
-      route: "/public-listings",
-      description: "تصفح جميع المنتجات"
+      description: "بيع أو تأجير منتجاتك الزراعية",
+      highlight: true
     },
     {
       icon: GiFarmTractor,
-      label: "ملفي الشخصي",
-      route: "/profile",
-      description: "إدارة حسابك"
+      label: "إضافة معدة أو أرض",
+      route: "/add-product",
+      description: "أضف جرارات، أراضي، أو معدات",
+      category: "equipment"
+    },
+    {
+      icon: PiFarm,
+      label: "تصفح المنتجات",
+      route: "/public-listings",
+      description: "اكتشف العروض المتاحة"
     },
   ];
 
@@ -76,29 +78,41 @@ const DropdownAdd: React.FC<DropdownAddProps> = ({
             ${isRTL ? "left-0" : "right-0"}
           `}
         >
-          {menuItems.map((item) => (
+          {menuItems.map((item, index) => (
             <Link
-              key={item.route}
+              key={`${item.route}-${index}`}
               to={item.route}
               onClick={() => setIsOpen(false)}
-              className="
+              className={`
                 flex items-center px-4 py-3 
                 hover:bg-gray-700 
                 transition-colors duration-300
                 text-gray-200
                 font-['NeoSansArabicRegular']
                 group
-              "
+                ${item.highlight ? 'border-r-4 border-green-500 bg-gray-750' : ''}
+              `}
             >
-              <item.icon className="w-5 h-5 ml-3 group-hover:text-green-400 transition-colors" />
+              <item.icon className={`w-5 h-5 ml-3 transition-colors ${
+                item.highlight 
+                  ? 'text-green-400 group-hover:text-green-300' 
+                  : 'group-hover:text-green-400'
+              }`} />
               <div className="flex-1 text-right">
-                <div className="text-sm font-semibold group-hover:text-white transition-colors">
+                <div className={`text-sm font-semibold group-hover:text-white transition-colors ${
+                  item.highlight ? 'text-green-300' : ''
+                }`}>
                   {item.label}
                 </div>
                 <div className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors">
                   {item.description}
                 </div>
               </div>
+              {item.highlight && (
+                <div className="text-green-400 text-xs font-bold">
+                  جديد
+                </div>
+              )}
             </Link>
           ))}
         </div>

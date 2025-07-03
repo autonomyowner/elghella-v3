@@ -1,21 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { navigationConfig } from "../config/NavigationConfig";
 import Logo from "../assets/logo.svg";
 import { useAuth } from "../context/AuthContext";
 import UserMenu from "../components/DropdownUser";
 import DropdownAdd from "../components/DropdownAdd";
-import { AiOutlineMenu, AiOutlinePlus } from "react-icons/ai";
+import { AiOutlineMenu } from "react-icons/ai";
 import { FaBoxArchive } from "react-icons/fa6";
 import { LogIn, ChevronDown } from "lucide-react";
 
 export default function Navbar({
   toggleSidebar,
-  isSidebarOpen,
   isRTL = false,
 }: {
   toggleSidebar: () => void;
-  isSidebarOpen: boolean;
   isRTL?: boolean;
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -317,7 +314,7 @@ export default function Navbar({
             <div className="flex items-center">
               {!isAuthenticated ? (
                 <Link
-                  to="/Login"
+                  to="/login"
                   className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 font-['NeoSansArabicMedium']"
                 >
                   <LogIn className="w-4 h-4 mr-2" />

@@ -50,7 +50,7 @@ const heroImages = [
 export default function Section1Hero({ id = "hero" }: { id?: string }) {
   const [searchValue, setSearchValue] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [, setImageLoaded] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {

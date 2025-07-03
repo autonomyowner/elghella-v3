@@ -15,7 +15,6 @@ export default function Layout() {
       >
         <Navbar
           toggleSidebar={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          isSidebarOpen={isMobileMenuOpen}
         />
         <Sidebar
           isOpen={isMobileMenuOpen}
