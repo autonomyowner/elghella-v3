@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 اختبار الاتصال - منصة الغلة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        h1 { font-size: 3rem; margin-bottom: 20px; }
+        .success { font-size: 1.5rem; margin: 20px 0; }
+        .links { margin: 30px 0; }
+        .links a {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            background: #065f46;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .links a:hover { transform: scale(1.05); background: #047857; }
+        .note {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌾 منصة الغلة</h1>
+        <div class="success">
+            ✅ الخادم يعمل بنجاح!<br>
+            🚀 المليون دولار SaaS جاهز!
+        </div>
+
+        <div class="links">
+            <a href="/" onclick="testMainSite()">🏠 الموقع الرئيسي</a>
+            <a href="/analytics">📊 التحليلات</a>
+            <a href="/ai-recommendations">🧠 الذكاء الاصطناعي</a>
+            <a href="/subscription">💳 الاشتراكات</a>
+        </div>
+
+        <div class="note">
+            <h3>📋 تعليمات الاختبار:</h3>
+            <p>1. إذا رأيت هذه الصفحة، فإن الخادم يعمل بنجاح</p>
+            <p>2. اضغط على "الموقع الرئيسي" للانتقال للتطبيق الكامل</p>
+            <p>3. إذا لم يحمل الموقع، تحقق من وحدة التحكم (F12)</p>
+        </div>
+
+        <div id="test-results" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+            <strong>نتائج الاختبار:</strong>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test basic functionality
+        function runTests() {
+            const results = document.getElementById('results');
+            let tests = [];
+            
+            // Test 1: Basic JavaScript
+            tests.push('✅ JavaScript يعمل');
+            
+            // Test 2: Fetch API
+            fetch('/status.html')
+                .then(response => {
+                    if (response.ok) {
+                        tests.push('✅ Fetch API يعمل');
+                    } else {
+                        tests.push('❌ Fetch API لا يعمل');
+                    }
+                })
+                .catch(() => {
+                    tests.push('❌ خطأ في Fetch API');
+                })
+                .finally(() => {
+                    results.innerHTML = tests.join('<br>');
+                });
+        }
+        
+        function testMainSite() {
+            // Try to navigate to main site
+            try {
+                window.location.href = '/';
+            } catch (error) {
+                alert('خطأ في التنقل: ' + error.message);
+            }
+        }
+        
+        // Run tests on load
+        runTests();
+        
+        // Auto refresh test every 5 seconds
+        setInterval(runTests, 5000);
+    </script>
+</body>
+</html>
