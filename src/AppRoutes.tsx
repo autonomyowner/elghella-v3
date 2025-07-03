@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Suspense, lazy } from "react";
 
@@ -52,10 +52,9 @@ const pageVariants = {
 
 function AppRoutes() {
   return (
-    <Router>
-      <AnimatePresence mode="wait">
-        <Suspense fallback={<EnterpriseLoading />}>
-          <Routes>
+    <AnimatePresence mode="wait">
+      <Suspense fallback={<EnterpriseLoading />}>
+        <Routes>
               {/* Main Pages */}
               <Route 
                 path="/" 
@@ -244,10 +243,9 @@ function AppRoutes() {
                   </motion.div>
                 } 
               />
-                       </Routes>
-         </Suspense>
-       </AnimatePresence>
-     </Router>
+                                </Routes>
+       </Suspense>
+     </AnimatePresence>
    );
  }
 
