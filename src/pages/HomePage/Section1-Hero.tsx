@@ -13,52 +13,37 @@ const stats = [
   { icon: Award, value: "5+", label: "سنوات خبرة" }
 ];
 
-// Beautiful agricultural background images from your assets
+// Beautiful agricultural background images - FIXED PATHS
 const heroImages = [
   {
-    src: "/public/assets/Homepage/trees.webp",
+    src: "/assets/Homepage/trees.webp",
     title: "المناظر الطبيعية الزراعية",
     description: "جمال الطبيعة الزراعية الجزائرية"
   },
   {
-    src: "/public/assets/Homepage/west.webp", 
+    src: "/assets/Homepage/west.webp", 
     title: "المناطق الزراعية الغربية",
     description: "أراضي زراعية خصبة ومتنوعة"
   },
   {
-    src: "/src/assets/LandRentPage/AddLands/farmlands.jpg",
-    title: "الأراضي الزراعية",
-    description: "أفضل الأراضي للإنتاج الزراعي"
+    src: "/assets/Homepage/hero.svg",
+    title: "رؤية الغلة الزراعية",
+    description: "منصة شاملة للزراعة الحديثة"
   },
   {
-    src: "/src/assets/LandRentPage/AddLands/orchard.jpg",
-    title: "بساتين الفواكه",
-    description: "بساتين مثمرة ومتطورة"
+    src: "/assets/Homepage/expertise.svg",
+    title: "الخبرة الزراعية",
+    description: "خدمات استشارية متخصصة"
   },
   {
-    src: "/src/assets/LandRentPage/AddLands/gardenLand.jpg",
-    title: "أراضي البساتين",
-    description: "زراعة متخصصة ومتقدمة"
+    src: "/assets/Homepage/greengrocer.svg",
+    title: "تجارة المنتجات الزراعية",
+    description: "أفضل المنتجات الطبيعية"
   },
   {
-    src: "/src/assets/ExpertisePage/Climate.png",
-    title: "التقنيات الزراعية الحديثة",
-    description: "تكنولوجيا زراعية متطورة"
-  },
-  {
-    src: "/src/assets/ExpertisePage/Monitoring.jpg",
-    title: "مراقبة المحاصيل",
-    description: "نظم مراقبة حديثة للمحاصيل"
-  },
-  {
-    src: "/src/assets/GreengrocerPage/AddGroceries/fruits.jpg",
-    title: "الفواكه الطازجة",
-    description: "أجود أنواع الفواكه الطبيعية"
-  },
-  {
-    src: "/src/assets/GreengrocerPage/AddGroceries/Vegetables.jpg",
-    title: "الخضروات الطبيعية", 
-    description: "خضروات طازجة ومغذية"
+    src: "/assets/Homepage/machinerent.svg",
+    title: "تأجير المعدات الزراعية",
+    description: "معدات حديثة ومتطورة"
   }
 ];
 

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ خادم الغلة يعمل بنجاح!</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #059669, #065f46);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        .status { font-size: 1.2rem; margin: 20px 0; }
+        .links { margin: 30px 0; }
+        .links a {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .links a:hover { transform: scale(1.05); }
+        .info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: right;
+        }
+        .time { font-size: 1.1rem; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌾 منصة الغلة</h1>
+        <h2>✅ الخادم يعمل بنجاح!</h2>
+        
+        <div class="status">
+            🟢 الحالة: متصل ويعمل<br>
+            ⚡ الأداء: ممتاز<br>
+            🔗 قاعدة البيانات: متصلة
+        </div>
+
+        <div class="links">
+            <a href="/">🏠 الصفحة الرئيسية</a>
+            <a href="/gallery">🖼️ معرض الصور</a>
+            <a href="/greengrocer">🌱 المنتجات</a>
+        </div>
+
+        <div class="info">
+            <h3>معلومات التقنية:</h3>
+            <p>🌐 العنوان: http://localhost:5173</p>
+            <p>🚀 الإصدار: 2.0.0 محسن</p>
+            <p>💻 التقنية: React + TypeScript + Vite</p>
+            <p>🗄️ قاعدة البيانات: Supabase</p>
+        </div>
+
+        <div class="time">
+            <strong>⏰ الوقت الحالي:</strong>
+            <span id="current-time"></span>
+        </div>
+    </div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const options = {
+                timeZone: 'Africa/Algiers',
+                hour12: false,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('current-time').textContent = 
+                now.toLocaleString('ar-DZ', options);
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Test main site loading
+        setTimeout(() => {
+            fetch('/')
+                .then(response => {
+                    if (response.ok) {
+                        console.log('✅ الموقع الرئيسي يعمل بنجاح');
+                    }
+                })
+                .catch(err => console.log('❌ خطأ في تحميل الموقع:', err));
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import ImageGallery from "../components/enhanced/ImageGallery";
 import { Helmet } from "react-helmet";
 
-// All the beautiful agricultural images from your assets
+// All the beautiful agricultural images from your assets - FIXED PATHS
 const galleryImages = [
   // Landscapes
   {
@@ -120,7 +120,7 @@ const galleryImages = [
     category: "technology"
   },
 
-  // SVG Illustrations
+  // SVG Illustrations - Using available assets
   {
     src: "/assets/Homepage/expertise.svg",
     title: "الخبرة الزراعية",
@@ -137,6 +137,36 @@ const galleryImages = [
     src: "/assets/Homepage/machinerent.svg",
     title: "تأجير المعدات الزراعية",
     description: "رسوم توضيحية للمعدات الزراعية",
+    category: "technology"
+  },
+  {
+    src: "/assets/Homepage/hero.svg",
+    title: "رؤية منصة الغلة",
+    description: "رؤية شاملة لمستقبل الزراعة",
+    category: "landscapes"
+  },
+  {
+    src: "/assets/Homepage/about-us.svg",
+    title: "من نحن",
+    description: "قصة منصة الغلة ورؤيتها",
+    category: "technology"
+  },
+  {
+    src: "/assets/Homepage/story1.svg",
+    title: "قصة النجاح الأولى",
+    description: "رحلة التطوير والإنجاز",
+    category: "technology"
+  },
+  {
+    src: "/assets/Homepage/story2.svg",
+    title: "قصة النجاح الثانية",
+    description: "مسيرة النمو والتوسع",
+    category: "technology"
+  },
+  {
+    src: "/assets/Homepage/vr.webp",
+    title: "التقنيات الحديثة",
+    description: "الواقع الافتراضي في الزراعة",
     category: "technology"
   }
 ];
@@ -187,7 +217,7 @@ export default function GalleryPage() {
                   transition={{ delay: 0.4, duration: 0.6 }}
                   className="bg-white rounded-lg p-4 shadow-md"
                 >
-                  <div className="text-3xl font-bold text-green-600">6</div>
+                  <div className="text-3xl font-bold text-green-600">4</div>
                   <div className="text-gray-600">فئات متنوعة</div>
                 </motion.div>
                 
