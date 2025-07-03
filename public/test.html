@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>✅ Elghella Server Test</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 50px; background: #green; }
+        h1 { color: #22c55e; }
+    </style>
+</head>
+<body>
+    <h1>🎉 SERVER IS WORKING!</h1>
+    <p>✅ Your Elghella development server is running correctly!</p>
+    <p>🔗 Main site: <a href="/">Go to Homepage</a></p>
+    <p>⏰ Time: <span id="time"></span></p>
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleString();
+        setInterval(() => {
+            document.getElementById('time').textContent = new Date().toLocaleString();
+        }, 1000);
+    </script>
+</body>
+</html>
