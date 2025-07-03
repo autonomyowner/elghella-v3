@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import Button from '../components/ui/Button';
+import { debugSupabase } from '../utils/debug';
 
 const categories = [
   { id: 'land', name: 'الأراضي الزراعية', icon: '🌾', popular: true },
@@ -115,12 +116,25 @@ export default function AddProduct() {
     setLoading(true);
 
     try {
-      // Basic validation
+      // 🔍 ENHANCED DEBUGGING: Basic validation
       if (!formData.title || !formData.description || !formData.category || !formData.price) {
         toast.error('يرجى ملء جميع الحقول المطلوبة');
         setLoading(false);
         return;
       }
+
+      // 🔍 Check authentication from Supabase
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !authUser) {
+        toast.error('يجب تسجيل الدخول أولاً. خطأ المصادقة: ' + (authError?.message || 'غير مسجل دخول'));
+        setLoading(false);
+        return;
+      }
+
+      console.log('🔍 DEBUG: Starting product submission...');
+      console.log('🔍 User:', user);
+      console.log('🔍 Form data:', formData);
 
       toast.loading('جاري رفع الصور...', { id: 'upload' });
 
@@ -128,17 +142,28 @@ export default function AddProduct() {
       const imageUrls = [];
       
       if (formData.images.length > 0) {
+        console.log('🔍 DEBUG: Uploading images...', formData.images.length);
+        
         for (const image of formData.images) {
           const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}_${image.name}`;
           
           try {
+            console.log('🔍 DEBUG: Uploading image:', fileName);
+            
+            // Test bucket access first
+            const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+            console.log('🔍 DEBUG: Available buckets:', buckets);
+            
+            if (bucketsError) {
+              console.error('🔍 DEBUG: Bucket access error:', bucketsError);
+            }
+
             const { error } = await supabase.storage
               .from('product-images')
               .upload(fileName, image);
 
             if (error) {
-              console.error('Image upload error:', error);
-              // If bucket doesn't exist, create it or continue without images
+              console.error('🔍 DEBUG: Image upload error:', error);
               console.warn('تعذر رفع الصورة، سيتم النشر بدون صور');
               continue;
             }
@@ -148,9 +173,10 @@ export default function AddProduct() {
               .from('product-images')
               .getPublicUrl(fileName);
             
+            console.log('🔍 DEBUG: Image uploaded successfully:', publicUrl);
             imageUrls.push(publicUrl);
           } catch (imgError) {
-            console.error('Image processing error:', imgError);
+            console.error('🔍 DEBUG: Image processing error:', imgError);
             continue;
           }
         }
@@ -158,6 +184,9 @@ export default function AddProduct() {
 
       toast.dismiss('upload');
       toast.loading('جاري نشر المنتج...', { id: 'create' });
+
+      console.log('🔍 DEBUG: User from context:', user);
+      console.log('🔍 DEBUG: User from Supabase:', authUser);
 
       // Prepare product data
       const productData = {
@@ -169,66 +198,99 @@ export default function AddProduct() {
         location: formData.location || null,
         contact_phone: formData.contact_phone || null,
         images: imageUrls.length > 0 ? imageUrls : null,
-        user_id: user?.userId,
+        user_id: authUser?.id || user?.userId || user?.email, // Use Supabase user ID
         user_email: user?.email,
         status: 'active',
         created_at: new Date().toISOString()
       };
 
-      console.log('Submitting product data:', productData);
+      console.log('🔍 DEBUG: Product data prepared:', productData);
+
+      // 🔍 ENHANCED: Test database connection first
+      try {
+        const { data: testConnection, error: connectionError } = await supabase
+          .from('marketplace_items')
+          .select('count')
+          .limit(1);
+        
+        console.log('🔍 DEBUG: Database connection test:', { testConnection, connectionError });
+      } catch (connectionTest) {
+        console.log('🔍 DEBUG: Connection test failed:', connectionTest);
+      }
 
       // Insert product data - try different table names as fallback
       let insertResult = null;
       let tableUsed = '';
+      let lastError = null;
 
       // Try marketplace_items first
       try {
+        console.log('🔍 DEBUG: Trying marketplace_items table...');
         const { data, error } = await supabase
           .from('marketplace_items')
-          .insert(productData);
+          .insert(productData)
+          .select();
         
         if (!error) {
           insertResult = data;
           tableUsed = 'marketplace_items';
+          console.log('🔍 DEBUG: Success with marketplace_items');
         } else {
+          lastError = error;
           throw error;
         }
       } catch (firstError) {
-        console.log('marketplace_items table not found, trying products...');
+        console.log('🔍 DEBUG: marketplace_items failed:', firstError);
+        lastError = firstError;
         
         // Fallback to products table
         try {
+          console.log('🔍 DEBUG: Trying products table...');
           const { data, error } = await supabase
             .from('products')
-            .insert(productData);
+            .insert(productData)
+            .select();
           
           if (!error) {
             insertResult = data;
             tableUsed = 'products';
+            console.log('🔍 DEBUG: Success with products');
           } else {
+            lastError = error;
             throw error;
           }
         } catch (secondError) {
-          console.log('products table not found, trying listings...');
+          console.log('🔍 DEBUG: products failed:', secondError);
+          lastError = secondError;
           
           // Fallback to listings table
-          const { data, error } = await supabase
-            .from('listings')
-            .insert(productData);
-          
-          if (error) {
-            throw error;
+          try {
+            console.log('🔍 DEBUG: Trying listings table...');
+            const { data, error } = await supabase
+              .from('listings')
+              .insert(productData)
+              .select();
+            
+            if (error) {
+              lastError = error;
+              throw error;
+            }
+            
+            insertResult = data;
+            tableUsed = 'listings';
+            console.log('🔍 DEBUG: Success with listings');
+          } catch (thirdError) {
+            console.log('🔍 DEBUG: All tables failed:', thirdError);
+            lastError = thirdError;
+            throw thirdError;
           }
-          
-          insertResult = data;
-          tableUsed = 'listings';
         }
       }
 
       toast.dismiss('create');
       toast.success(`تم نشر ${formData.type === 'sale' ? 'منتجك للبيع' : 'منتجك للإيجار'} بنجاح!`);
       
-      console.log(`Product inserted successfully into ${tableUsed}:`, insertResult);
+      console.log(`🔍 DEBUG: Product inserted successfully into ${tableUsed}:`, insertResult);
 
       // Reset form
       setFormData({
@@ -249,20 +311,38 @@ export default function AddProduct() {
       }, 1500);
 
     } catch (error: any) {
-      console.error('Error adding product:', error);
+      console.error('🔍 DEBUG: Final error caught:', error);
+      console.error('🔍 DEBUG: Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        stack: error.stack
+      });
+      
       toast.dismiss();
       
       let errorMessage = 'حدث خطأ غير متوقع';
       
+      // 🔍 ENHANCED ERROR MESSAGES
       if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
         errorMessage = 'جدول قاعدة البيانات غير متوفر. يرجى التواصل مع الإدارة.';
-      } else if (error.message?.includes('permission')) {
+      } else if (error.message?.includes('permission') || error.message?.includes('RLS')) {
         errorMessage = 'ليس لديك صلاحية لإضافة منتجات. يرجى التواصل مع الإدارة.';
+      } else if (error.message?.includes('JWT') || error.message?.includes('auth')) {
+        errorMessage = 'خطأ في المصادقة. يرجى تسجيل الخروج والدخول مرة أخرى.';
+      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+        errorMessage = 'خطأ في الاتصال. تحقق من الإنترنت وحاول مرة أخرى.';
+      } else if (error.code === 'PGRST301') {
+        errorMessage = 'خطأ في إعدادات قاعدة البيانات. يرجى التواصل مع الإدارة.';
       } else if (error.message) {
-        errorMessage = error.message;
+        errorMessage = `خطأ تقني: ${error.message}`;
       }
       
-      toast.error('فشل في نشر المنتج: ' + errorMessage);
+              // Show detailed error for debugging
+        const debugInfo = `\n\nتفاصيل للمطور:\nError: ${error.message || 'Unknown'}\nCode: ${error.code || 'N/A'}`;
+        
+        toast.error('فشل في نشر المنتج: ' + errorMessage + (process.env.NODE_ENV === 'development' ? debugInfo : ''));
     } finally {
       setLoading(false);
     }
@@ -588,6 +668,25 @@ export default function AddProduct() {
               >
                 إلغاء
               </Button>
+              
+              {/* 🔍 Debug Button (Development only) */}
+              {process.env.NODE_ENV === 'development' && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={async () => {
+                    toast.loading('تشغيل فحص النظام...', { id: 'debug' });
+                    const result = await debugSupabase();
+                    toast.dismiss('debug');
+                    console.log('🔍 FULL DEBUG RESULT:', result);
+                    toast.success('تم الفحص - تحقق من Console');
+                  }}
+                  className="px-6 bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100"
+                >
+                  🔍 فحص
+                </Button>
+              )}
             </div>
           </form>
         </motion.div>
