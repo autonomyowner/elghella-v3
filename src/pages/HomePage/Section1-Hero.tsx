@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { ChevronDown, Leaf, Users, TrendingUp, Award, Tractor, Sprout } from "lucide-react";
+import { Link } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import SearchInput from "../../components/ui/SearchInput";
 
@@ -224,6 +225,28 @@ export default function Section1Hero({ id = "hero" }: { id?: string }) {
             >
               قصة نجاحنا
             </Button>
+          </motion.div>
+
+          {/* 🚁 NEW: Upcoming Services Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4, duration: 0.8 }}
+            className="mt-16"
+          >
+            <Link
+              to="/upcoming-services"
+              className="inline-flex items-center bg-gradient-to-r from-blue-500/90 to-purple-600/90 backdrop-blur-sm text-white px-8 py-4 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-2xl border border-white/20"
+            >
+              <span className="text-3xl mr-4 animate-bounce">🚁</span>
+              <div className="text-center">
+                <div className="font-['NeoSansArabicBold'] text-lg">خدمات مستقبلية مبتكرة</div>
+                <div className="text-sm opacity-90">طائرات مسيرة | زراعة دقيقة | مراقبة ذكية</div>
+              </div>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-xs mr-4 animate-pulse font-bold">
+                قريباً 2025
+              </span>
+            </Link>
           </motion.div>
         </motion.div>
 

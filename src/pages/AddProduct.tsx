@@ -19,6 +19,9 @@ const categories = [
   { id: 'services', name: 'الخدمات الزراعية', icon: '👨‍🌾' },
   { id: 'storage', name: 'المخازن والتخزين', icon: '🏢' },
   { id: 'irrigation', name: 'أنظمة الري', icon: '💧' },
+  { id: 'drone-services', name: 'خدمات الطائرات المسيرة', icon: '🚁', upcoming: true },
+  { id: 'precision-ag', name: 'الزراعة الدقيقة', icon: '🎯', upcoming: true },
+  { id: 'aerial-monitoring', name: 'المراقبة الجوية', icon: '📡', upcoming: true },
   { id: 'other', name: 'أخرى', icon: '📦' }
 ];
 
@@ -389,22 +392,34 @@ export default function AddProduct() {
                   {categories.filter(cat => cat.popular).map(cat => (
                     <label
                       key={cat.id}
-                      className={`cursor-pointer border-2 rounded-lg p-3 text-center transition-all text-sm ${
-                        formData.category === cat.id
-                          ? 'border-green-500 bg-green-50 text-green-700'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      className={`border-2 rounded-lg p-3 text-center transition-all text-sm relative ${
+                        cat.upcoming
+                          ? 'border-blue-200 bg-blue-50 text-blue-600 cursor-not-allowed opacity-75'
+                          : formData.category === cat.id
+                          ? 'border-green-500 bg-green-50 text-green-700 cursor-pointer'
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 cursor-pointer'
                       }`}
+                      onClick={cat.upcoming ? (e) => {
+                        e.preventDefault();
+                        alert(`${cat.name} - ستكون متوفرة قريباً! 🚀`);
+                      } : undefined}
                     >
                       <input
                         type="radio"
                         name="category"
                         value={cat.id}
                         checked={formData.category === cat.id}
-                        onChange={handleInputChange}
+                        onChange={cat.upcoming ? undefined : handleInputChange}
                         className="sr-only"
+                        disabled={cat.upcoming}
                       />
                       <div className="text-2xl mb-1">{cat.icon}</div>
                       <div className="font-['NeoSansArabicMedium']">{cat.name}</div>
+                      {cat.upcoming && (
+                        <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+                          قريباً
+                        </div>
+                      )}
                     </label>
                   ))}
                 </div>
@@ -421,8 +436,13 @@ export default function AddProduct() {
                 >
                   <option value="">اختر الفئة</option>
                   {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.icon} {cat.name}
+                    <option 
+                      key={cat.id} 
+                      value={cat.upcoming ? '' : cat.id}
+                      disabled={cat.upcoming}
+                      style={cat.upcoming ? { color: '#9CA3AF', fontStyle: 'italic' } : {}}
+                    >
+                      {cat.icon} {cat.name} {cat.upcoming ? '(قريباً)' : ''}
                     </option>
                   ))}
                 </select>

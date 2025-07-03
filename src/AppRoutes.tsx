@@ -16,6 +16,7 @@ import PublicListings from "./pages/PublicListings";
 import SeedlingsPage from "./pages/SeedlingsPage";
 import LoginPage from "./pages/auth/LoginPage";
 import AddProduct from "./pages/AddProduct";
+import UpcomingServices from "./pages/UpcomingServices";
 
 // Lazy load improved components for better performance
 const AnalyticsDashboard = lazy(() => import("./pages/Dashboard/AnalyticsDashboard"));
@@ -129,6 +130,44 @@ function AppRoutes() {
                 element={
                   <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
                     <SmartRecommendations />
+                  </motion.div>
+                } 
+              />
+
+              {/* 🚁 UPCOMING SERVICES - INNOVATION PREVIEW */}
+              
+              {/* Upcoming Services Overview */}
+              <Route 
+                path="/upcoming-services" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <UpcomingServices />
+                  </motion.div>
+                } 
+              />
+              
+              {/* Individual Upcoming Service Pages (redirect to main page) */}
+              <Route 
+                path="/drone-services" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <UpcomingServices />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/precision-agriculture" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <UpcomingServices />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/aerial-monitoring" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <UpcomingServices />
                   </motion.div>
                 } 
               />

@@ -83,7 +83,10 @@ export default function Navbar({
     { name: "تأجير المعدات", path: "/machine-rent", icon: "🚜" },
     { name: "المنتجات الزراعية", path: "/greengrocer", icon: "🥬" },
     { name: "الخدمات الاستشارية", path: "/expertise", icon: "👨‍🌾" },
-    { name: "الشتلات والبذور", path: "/seedlings", icon: "🌱" }
+    { name: "الشتلات والبذور", path: "/seedlings", icon: "🌱" },
+    { name: "خدمات الطائرات المسيرة", path: "/drone-services", icon: "🚁", badge: "قريباً", upcoming: true },
+    { name: "الزراعة الدقيقة", path: "/precision-agriculture", icon: "🎯", badge: "جديد", upcoming: true },
+    { name: "المراقبة الجوية", path: "/aerial-monitoring", icon: "📡", badge: "قريباً", upcoming: true }
   ];
 
   const enterpriseDropdown = [
@@ -129,25 +132,42 @@ export default function Navbar({
             key={index}
             onClick={(e) => {
               e.stopPropagation();
-              onItemClick(item.path);
+              if (item.upcoming) {
+                // Show upcoming message instead of navigating
+                alert(`${item.name} - هذه الخدمة ستكون متوفرة قريباً! 🚀`);
+              } else {
+                onItemClick(item.path);
+              }
             }}
-            className="w-full text-right px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors duration-200 flex items-center justify-between group"
+            className={`w-full text-right px-4 py-3 transition-colors duration-200 flex items-center justify-between group ${
+              item.upcoming 
+                ? 'text-gray-500 hover:bg-blue-50 hover:text-blue-600 cursor-pointer relative'
+                : 'text-gray-700 hover:bg-green-50 hover:text-green-600'
+            }`}
           >
             <div className="flex items-center">
-              <span className="text-lg mr-3">{item.icon}</span>
-              <span className="font-['NeoSansArabicMedium']">{item.name}</span>
+              <span className={`text-lg mr-3 ${item.upcoming ? 'opacity-70' : ''}`}>{item.icon}</span>
+              <span className={`font-['NeoSansArabicMedium'] ${item.upcoming ? 'opacity-80' : ''}`}>{item.name}</span>
             </div>
-            {item.badge && (
-              <span className={`px-2 py-1 text-xs rounded-full font-bold ${
-                item.badge === 'Pro' ? 'bg-blue-100 text-blue-600' :
-                item.badge === 'AI' ? 'bg-purple-100 text-purple-600' :
-                item.badge === 'Hot' ? 'bg-red-100 text-red-600' :
-                item.badge === 'Admin' ? 'bg-orange-100 text-orange-600' :
-                'bg-gray-100 text-gray-600'
-              }`}>
-                {item.badge}
-              </span>
-            )}
+            <div className="flex items-center space-x-2">
+              {item.upcoming && (
+                <span className="text-xs bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 py-1 rounded-full animate-pulse">
+                  ✨ قريباً
+                </span>
+              )}
+              {item.badge && !item.upcoming && (
+                <span className={`px-2 py-1 text-xs rounded-full font-bold ${
+                  item.badge === 'Pro' ? 'bg-blue-100 text-blue-600' :
+                  item.badge === 'AI' ? 'bg-purple-100 text-purple-600' :
+                  item.badge === 'Hot' ? 'bg-red-100 text-red-600' :
+                  item.badge === 'Admin' ? 'bg-orange-100 text-orange-600' :
+                  item.badge === 'جديد' ? 'bg-green-100 text-green-600' :
+                  'bg-gray-100 text-gray-600'
+                }`}>
+                  {item.badge}
+                </span>
+              )}
+            </div>
           </button>
         ))}
       </div>
