@@ -259,7 +259,7 @@ export default function Section1Hero({ id = "hero" }: { id?: string }) {
                 <div className="text-sm opacity-90">طائرات مسيرة | زراعة دقيقة | مراقبة ذكية</div>
               </div>
               <span className="bg-white/20 px-3 py-1 rounded-full text-xs mr-4 animate-pulse font-bold">
-                قريباً 2025
+                قريباً 2026
               </span>
             </Link>
           </motion.div>

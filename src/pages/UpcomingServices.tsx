@@ -28,7 +28,7 @@ const UpcomingServices = () => {
         'استخدام أمثل للمبيدات والأسمدة',
         'مراقبة GPS للدقة المطلقة'
       ],
-      launchDate: 'الربع الأول 2025',
+      launchDate: 'الربع الأول 2026',
       status: 'development',
       image: '/api/placeholder/400/250',
       gradient: 'from-blue-500 to-cyan-500'
@@ -46,7 +46,7 @@ const UpcomingServices = () => {
         'تنبؤات الطقس والآفات',
         'تتبع النمو والإنتاجية'
       ],
-      launchDate: 'منتصف 2025',
+      launchDate: 'منتصف 2026',
       status: 'planning',
       image: '/api/placeholder/400/250',
       gradient: 'from-green-500 to-emerald-500'
@@ -64,7 +64,7 @@ const UpcomingServices = () => {
         'تقارير مفصلة ودورية',
         'تنبيهات فورية للمشاكل'
       ],
-      launchDate: 'الربع الثالث 2025',
+      launchDate: 'الربع الثالث 2026',
       status: 'research',
       image: '/api/placeholder/400/250',
       gradient: 'from-purple-500 to-pink-500'
@@ -72,10 +72,10 @@ const UpcomingServices = () => {
   ];
 
   const timeline = [
-    { quarter: 'Q1 2025', title: 'إطلاق خدمات الطائرات المسيرة', status: 'next' },
-    { quarter: 'Q2 2025', title: 'بداية تقنيات الزراعة الدقيقة', status: 'future' },
-    { quarter: 'Q3 2025', title: 'المراقبة الجوية المتقدمة', status: 'future' },
-    { quarter: 'Q4 2025', title: 'خدمات إضافية وتوسعات', status: 'future' }
+    { quarter: 'Q1 2026', title: 'إطلاق خدمات الطائرات المسيرة', status: 'next' },
+    { quarter: 'Q2 2026', title: 'بداية تقنيات الزراعة الدقيقة', status: 'future' },
+    { quarter: 'Q3 2026', title: 'المراقبة الجوية المتقدمة', status: 'future' },
+    { quarter: 'Q4 2026', title: 'خدمات إضافية وتوسعات', status: 'future' }
   ];
 
   const getStatusBadge = (status: string) => {
@@ -124,7 +124,7 @@ const UpcomingServices = () => {
           >
             <div className="flex items-center bg-white/10 px-4 py-2 rounded-full">
               <Sparkles className="w-5 h-5 mr-2" />
-              <span>قريباً في 2025</span>
+              <span>قريباً في 2026</span>
             </div>
             <div className="flex items-center bg-white/10 px-4 py-2 rounded-full">
               <Star className="w-5 h-5 mr-2" />
@@ -215,7 +215,7 @@ const UpcomingServices = () => {
           className="bg-white rounded-2xl shadow-xl p-8"
         >
           <h3 className="text-2xl font-bold text-gray-900 font-['NeoSansArabicBold'] text-center mb-8">
-            خارطة الطريق 2025
+            خارطة الطريق 2026
           </h3>
           
           <div className="relative">

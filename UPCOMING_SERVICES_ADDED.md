@@ -33,13 +33,13 @@
 - **📋 Service Cards** for each upcoming service:
   - Detailed descriptions and benefits
   - Development status badges (Development, Planning, Research)
-  - Launch timeline (Q1-Q4 2025)
+  - Launch timeline (Q1-Q4 2026)
   - Feature lists with checkmarks
 
 #### **Services Detailed:**
 
 ##### **🚁 Drone Spraying Services**
-- **Launch:** Q1 2025
+- **Launch:** Q1 2026
 - **Status:** قيد التطوير (Development)
 - **Features:**
   - Precise and balanced crop spraying
@@ -49,7 +49,7 @@
   - GPS monitoring for absolute precision
 
 ##### **🎯 Precision Agriculture**  
-- **Launch:** Mid 2025
+- **Launch:** Mid 2026
 - **Status:** مرحلة التخطيط (Planning)
 - **Features:**
   - AI-powered soil analysis
@@ -59,7 +59,7 @@
   - Growth and productivity tracking
 
 ##### **📡 Aerial Monitoring**
-- **Launch:** Q3 2025  
+- **Launch:** Q3 2026  
 - **Status:** البحث والتطوير (Research & Development)
 - **Features:**
   - 24/7 field and livestock monitoring
@@ -68,11 +68,11 @@
   - Detailed and periodic reports
   - Instant problem alerts
 
-### 4. **2025 Roadmap Timeline**
-- **Q1 2025:** Launch Drone Services
-- **Q2 2025:** Begin Precision Agriculture
-- **Q3 2025:** Advanced Aerial Monitoring  
-- **Q4 2025:** Additional services and expansions
+### 4. **2026 Roadmap Timeline**
+- **Q1 2026:** Launch Drone Services
+- **Q2 2026:** Begin Precision Agriculture
+- **Q3 2026:** Advanced Aerial Monitoring
+- **Q4 2026:** Additional services and expansions
 
 ### 5. **Hero Section Integration**
 - **Prominent Banner** on homepage promoting upcoming services
@@ -162,6 +162,6 @@ if (item.upcoming) {
 ✅ **Created Roadmap** showing clear development timeline
 ✅ **Improved UX** with disabled states and clear messaging
 
-The Elghella platform now showcases its commitment to innovation and modern agricultural technology, building excitement for 2025 while maintaining current functionality!
+The Elghella platform now showcases its commitment to innovation and modern agricultural technology, building excitement for 2026 while maintaining current functionality!
 
 **Inspired by Rantizo's success model, adapted for Arabic agricultural markets.**
