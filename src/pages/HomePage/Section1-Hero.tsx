@@ -189,7 +189,7 @@ export default function Section1Hero({ id = "hero" }: { id?: string }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.8 }}
-            className="max-w-3xl mx-auto"
+            className="max-w-3xl mx-auto space-y-4"
           >
             <div className="relative">
               <SearchInput
@@ -198,10 +198,21 @@ export default function Section1Hero({ id = "hero" }: { id?: string }) {
                 placeholder="ابحث عن المنتجات والخدمات الزراعية... 🔍"
                 className="text-lg shadow-2xl"
               />
-              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-xs text-green-300">
-                اكتشف آلاف المنتجات والخدمات الزراعية
-              </div>
             </div>
+            
+            {/* Moved discovery text below with proper spacing */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.0, duration: 0.6 }}
+              className="text-center"
+            >
+              <div className="inline-flex items-center bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full px-6 py-2 text-sm text-green-300 font-medium shadow-lg">
+                <span className="mr-2">🌾</span>
+                اكتشف آلاف المنتجات والخدمات الزراعية
+                <span className="ml-2">🚜</span>
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Action Buttons */}
