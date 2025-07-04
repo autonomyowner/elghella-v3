@@ -73,32 +73,101 @@ const FarmMapPage: React.FC = () => {
   ]);
 
   useEffect(() => {
-    // 🌤️ FETCH LIVE WEATHER DATA
+    // 🌤️ ENHANCED WEATHER DATA WITH FALLBACKS
     const fetchWeatherData = async () => {
       try {
         setIsWeatherLoading(true);
         const API_KEY = '06dbb6c0777805cea0cc1dcbeb83e18c';
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=36.7538&lon=3.0588&appid=${API_KEY}&units=metric&lang=ar`);
+        
+        // Try primary API endpoint
+        let response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=36.7538&lon=3.0588&appid=${API_KEY}&units=metric&lang=ar`);
+        
+        if (!response.ok) {
+          // Fallback to English if Arabic fails
+          response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=36.7538&lon=3.0588&appid=${API_KEY}&units=metric`);
+        }
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
+        
+        // Validate data structure
+        if (!data.main || !data.weather || !data.wind) {
+          throw new Error('Invalid weather data structure');
+        }
         
         setWeatherData({
           temperature: `${Math.round(data.main.temp)}°C`,
           humidity: `${data.main.humidity}%`,
-          windSpeed: `${data.wind.speed} م/ث`,
-          description: data.weather[0].description
+          windSpeed: `${Math.round(data.wind.speed * 10) / 10} م/ث`,
+          description: data.weather[0].description || 'غائم جزئياً'
         });
         
         console.log('🌤️ Weather data loaded successfully!');
         setIsWeatherLoading(false);
+        
+        // Show success toast
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+          position: fixed;
+          top: 20px;
+          left: 20px;
+          background: #4CAF50;
+          color: white;
+          padding: 10px 15px;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+          z-index: 1000;
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+        `;
+        toast.innerHTML = '✅ تم تحديث بيانات الطقس';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 2000);
+        
       } catch (error) {
         console.error('خطأ في تحميل بيانات الطقس:', error);
+        
+        // Enhanced fallback with demo data
         setWeatherData({
-          temperature: 'غير متوفر',
-          humidity: 'غير متوفر',
-          windSpeed: 'غير متوفر',
-          description: 'غير متوفر'
+          temperature: '22°C',
+          humidity: '65%',
+          windSpeed: '2.1 م/ث',
+          description: 'غائم جزئياً (بيانات تجريبية)'
         });
+        
         setIsWeatherLoading(false);
+        
+        // Show error toast
+        const errorToast = document.createElement('div');
+        errorToast.style.cssText = `
+          position: fixed;
+          top: 20px;
+          left: 20px;
+          background: #FF9800;
+          color: white;
+          padding: 10px 15px;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+          z-index: 1000;
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+        `;
+        errorToast.innerHTML = '⚠️ استخدام بيانات طقس تجريبية';
+        document.body.appendChild(errorToast);
+        
+        setTimeout(() => {
+          if (errorToast.parentNode) {
+            errorToast.parentNode.removeChild(errorToast);
+          }
+        }, 3000);
       }
     };
 
@@ -294,12 +363,37 @@ const FarmMapPage: React.FC = () => {
         // Add weather layer for immediate visual impact
         precipitationLayer.addTo(map);
 
-        // Custom farm icon
+        // Fixed farm icon - simpler and more reliable
         const farmIcon = window.L.divIcon({
-          html: '<div style="background: #4CAF50; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); border: 3px solid white;">🌾</div>',
-          iconSize: [40, 40],
-          className: 'custom-farm-icon'
+          html: '🌾',
+          iconSize: [30, 30],
+          className: 'farm-marker-icon',
+          iconAnchor: [15, 15]
         });
+
+        // Add CSS for farm icon
+        const iconStyle = document.createElement('style');
+        iconStyle.textContent = `
+          .farm-marker-icon {
+            background: #4CAF50 !important;
+            color: white !important;
+            border-radius: 50% !important;
+            width: 40px !important;
+            height: 40px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 20px !important;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4) !important;
+            border: 3px solid white !important;
+            transition: all 0.3s ease !important;
+          }
+          .farm-marker-icon:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.6) !important;
+          }
+        `;
+        document.head.appendChild(iconStyle);
 
         // Enhanced farm markers with detailed information
         farms.forEach((farm, index) => {
@@ -379,179 +473,221 @@ const FarmMapPage: React.FC = () => {
           zoomOutTitle: 'تصغير'
         }).addTo(map);
 
-        // Add measurement tool
-        const MeasurementControl = window.L.Control.extend({
-          onAdd: function(map: any) {
-            const div = window.L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-            
-            div.style.cssText = `
-              background: white;
-              border-radius: 8px;
-              box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-              padding: 5px;
-            `;
-            
-            div.innerHTML = `
-              <div style="display: flex; flex-direction: column; gap: 2px;">
-                <button id="measure-distance" style="
-                  background: #4CAF50; 
-                  color: white; 
-                  border: none; 
-                  padding: 8px 12px; 
-                  border-radius: 4px; 
-                  cursor: pointer; 
-                  font-size: 11px;
-                  font-weight: bold;
-                " title="قياس المسافة">📏 قياس</button>
-                <button id="clear-measurements" style="
-                  background: #f44336; 
-                  color: white; 
-                  border: none; 
-                  padding: 8px 12px; 
-                  border-radius: 4px; 
-                  cursor: pointer; 
-                  font-size: 11px;
-                  font-weight: bold;
-                " title="مسح القياسات">🗑️ مسح</button>
-              </div>
-            `;
-            
-            let measurementLayer = window.L.layerGroup().addTo(map);
-            let ismeasuring = false;
-            let measurementPoints: any[] = [];
-            
-            div.querySelector('#measure-distance')?.addEventListener('click', function() {
-              isMapping = true;
-              map.getContainer().style.cursor = 'crosshair';
+        // Enhanced measurement tool with better error handling
+        const createMeasurementTool = () => {
+          let measurementLayer = window.L.layerGroup().addTo(map);
+          let isMeasuring = false;
+          let measurementPoints: any[] = [];
+          
+          const MeasurementControl = window.L.Control.extend({
+            onAdd: function(mapInstance: any) {
+              const div = window.L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom measurement-control');
               
-              const toast = document.createElement('div');
-              toast.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 20px;
-                background: #4CAF50;
-                color: white;
-                padding: 10px 15px;
-                border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                z-index: 1000;
-                font-family: Arial, sans-serif;
-                direction: rtl;
+              div.innerHTML = `
+                <div class="measurement-buttons">
+                  <button id="measure-distance" class="measure-btn" title="قياس المسافة">
+                    📏 قياس
+                  </button>
+                  <button id="clear-measurements" class="clear-btn" title="مسح القياسات">
+                    🗑️ مسح
+                  </button>
+                </div>
               `;
-              toast.innerHTML = '📏 انقر على نقطتين لقياس المسافة';
-              document.body.appendChild(toast);
+              
+              // Prevent map interaction when clicking buttons
+              window.L.DomEvent.disableClickPropagation(div);
+              window.L.DomEvent.disableScrollPropagation(div);
+              
+              const measureBtn = div.querySelector('#measure-distance');
+              const clearBtn = div.querySelector('#clear-measurements');
+              
+              measureBtn?.addEventListener('click', function(e: Event) {
+                e.stopPropagation();
+                startMeasurement();
+              });
+              
+              clearBtn?.addEventListener('click', function(e: Event) {
+                e.stopPropagation();
+                clearMeasurements();
+              });
+              
+              return div;
+            }
+          });
+          
+          const startMeasurement = () => {
+            isMeasuring = true;
+            measurementPoints = [];
+            map.getContainer().style.cursor = 'crosshair';
+            
+            const toast = document.createElement('div');
+            toast.className = 'measurement-toast';
+            toast.innerHTML = '📏 انقر على نقطتين لقياس المسافة';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+              if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+              }
+            }, 3000);
+          };
+          
+          const clearMeasurements = () => {
+            measurementLayer.clearLayers();
+            measurementPoints = [];
+            isMeasuring = false;
+            map.getContainer().style.cursor = '';
+          };
+          
+          // Add click handler for measurements
+          map.on('click', function(e: any) {
+            if (!isMeasuring || measurementPoints.length >= 2) return;
+            
+            measurementPoints.push(e.latlng);
+            
+            // Add point marker
+            window.L.circleMarker(e.latlng, {
+              radius: 6,
+              color: '#4CAF50',
+              fillColor: '#4CAF50',
+              fillOpacity: 0.8,
+              weight: 2
+            }).addTo(measurementLayer);
+            
+            if (measurementPoints.length === 2) {
+              // Calculate distance
+              const distance = measurementPoints[0].distanceTo(measurementPoints[1]);
+              const distanceKm = (distance / 1000).toFixed(2);
+              const distanceM = distance.toFixed(0);
+              
+              // Draw line
+              window.L.polyline(measurementPoints, {
+                color: '#4CAF50',
+                weight: 3,
+                opacity: 0.8,
+                dashArray: '5, 10'
+              }).addTo(measurementLayer);
+              
+              // Add distance label
+              const midpoint = window.L.latLng(
+                (measurementPoints[0].lat + measurementPoints[1].lat) / 2,
+                (measurementPoints[0].lng + measurementPoints[1].lng) / 2
+              );
+              
+              window.L.marker(midpoint, {
+                icon: window.L.divIcon({
+                  html: `
+                    <div class="distance-label-marker">
+                      <strong>${distanceKm} كم</strong><br>
+                      ${distanceM} متر
+                    </div>
+                  `,
+                  className: 'distance-label-container',
+                  iconSize: [80, 40],
+                  iconAnchor: [40, 20]
+                })
+              }).addTo(measurementLayer);
+              
+              // Reset measurement mode
+              isMeasuring = false;
+              map.getContainer().style.cursor = '';
+              
+              // Show completion message
+              const successToast = document.createElement('div');
+              successToast.className = 'success-toast';
+              successToast.innerHTML = `✅ المسافة: ${distanceKm} كم (${distanceM} متر)`;
+              document.body.appendChild(successToast);
               
               setTimeout(() => {
-                if (toast.parentNode) {
-                  toast.parentNode.removeChild(toast);
+                if (successToast.parentNode) {
+                  successToast.parentNode.removeChild(successToast);
                 }
-              }, 3000);
-            });
-            
-            div.querySelector('#clear-measurements')?.addEventListener('click', function() {
-              measurementLayer.clearLayers();
-              measurementPoints = [];
-              isMapping = false;
-              map.getContainer().style.cursor = '';
-            });
-            
-            // Add measurement click handler
-            let isMapping = false;
-            map.on('click', function(e: any) {
-              if (isMapping && measurementPoints.length < 2) {
-                measurementPoints.push(e.latlng);
-                
-                // Add point marker
-                const pointMarker = window.L.circleMarker(e.latlng, {
-                  radius: 6,
-                  color: '#4CAF50',
-                  fillColor: '#4CAF50',
-                  fillOpacity: 0.8
-                }).addTo(measurementLayer);
-                
-                if (measurementPoints.length === 2) {
-                  // Calculate distance
-                  const distance = measurementPoints[0].distanceTo(measurementPoints[1]);
-                  const distanceKm = (distance / 1000).toFixed(2);
-                  const distanceM = distance.toFixed(0);
-                  
-                  // Draw line
-                  const line = window.L.polyline(measurementPoints, {
-                    color: '#4CAF50',
-                    weight: 3,
-                    opacity: 0.8
-                  }).addTo(measurementLayer);
-                  
-                  // Add distance label
-                  const midpoint = window.L.latLng(
-                    (measurementPoints[0].lat + measurementPoints[1].lat) / 2,
-                    (measurementPoints[0].lng + measurementPoints[1].lng) / 2
-                  );
-                  
-                  const label = window.L.marker(midpoint, {
-                    icon: window.L.divIcon({
-                      html: `
-                        <div style="
-                          background: white; 
-                          padding: 4px 8px; 
-                          border-radius: 4px; 
-                          border: 2px solid #4CAF50; 
-                          font-size: 12px; 
-                          font-weight: bold; 
-                          color: #4CAF50;
-                          text-align: center;
-                          min-width: 60px;
-                        ">
-                          ${distanceKm} كم<br>
-                          ${distanceM} م
-                        </div>
-                      `,
-                      className: 'distance-label',
-                      iconSize: [60, 30]
-                    })
-                  }).addTo(measurementLayer);
-                  
-                  // Reset measurement mode
-                  measurementPoints = [];
-                  isMapping = false;
-                  map.getContainer().style.cursor = '';
-                  
-                  // Show completion message
-                  const successToast = document.createElement('div');
-                  successToast.style.cssText = `
-                    position: fixed;
-                    top: 100px;
-                    right: 20px;
-                    background: #2196F3;
-                    color: white;
-                    padding: 10px 15px;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                    z-index: 1000;
-                    font-family: Arial, sans-serif;
-                    direction: rtl;
-                  `;
-                  successToast.innerHTML = `✅ المسافة: ${distanceKm} كم (${distanceM} متر)`;
-                  document.body.appendChild(successToast);
-                  
-                  setTimeout(() => {
-                    if (successToast.parentNode) {
-                      successToast.parentNode.removeChild(successToast);
-                    }
-                  }, 4000);
-                }
-              }
-            });
-            
-            return div;
-          },
+              }, 4000);
+            }
+          });
           
-          onRemove: function(map: any) {
-            // Cleanup if needed
-          }
-        });
+          return MeasurementControl;
+        };
 
+        // Add measurement control
+        const MeasurementControl = createMeasurementTool();
         new MeasurementControl({ position: 'topleft' }).addTo(map);
+
+        // Add CSS for measurement tool
+        const measurementStyle = document.createElement('style');
+        measurementStyle.textContent = `
+          .measurement-control {
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+            padding: 8px !important;
+          }
+          .measurement-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+          }
+          .measure-btn, .clear-btn {
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+          }
+          .measure-btn {
+            background: #4CAF50;
+            color: white;
+          }
+          .measure-btn:hover {
+            background: #45a049;
+            transform: scale(1.05);
+          }
+          .clear-btn {
+            background: #f44336;
+            color: white;
+          }
+          .clear-btn:hover {
+            background: #da190b;
+            transform: scale(1.05);
+          }
+          .measurement-toast, .success-toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            font-size: 14px;
+          }
+          .measurement-toast {
+            background: #4CAF50;
+          }
+          .success-toast {
+            background: #2196F3;
+          }
+          .distance-label-marker {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 2px solid #4CAF50;
+            font-size: 12px;
+            font-weight: bold;
+            color: #4CAF50;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+          }
+          .distance-label-container {
+            background: transparent !important;
+            border: none !important;
+          }
+        `;
+        document.head.appendChild(measurementStyle);
 
         // Add location marker for current position (if available)
         if (navigator.geolocation) {
