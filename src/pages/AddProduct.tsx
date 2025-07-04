@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import Button from '../components/ui/Button';
 import { debugSupabase } from '../utils/debug';
+import { submitProduct, checkDatabaseHealth, suggestDatabaseSetup, type ProductData } from '../utils/productSubmission';
 
 const categories = [
   { id: 'land', name: 'الأراضي الزراعية', icon: '🌾', popular: true },
@@ -133,8 +134,6 @@ export default function AddProduct() {
       }
 
       console.log('🔍 DEBUG: Starting product submission...');
-      console.log('🔍 User:', user);
-      console.log('🔍 Form data:', formData);
 
       toast.loading('جاري رفع الصور...', { id: 'upload' });
 
@@ -148,23 +147,12 @@ export default function AddProduct() {
           const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}_${image.name}`;
           
           try {
-            console.log('🔍 DEBUG: Uploading image:', fileName);
-            
-            // Test bucket access first
-            const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
-            console.log('🔍 DEBUG: Available buckets:', buckets);
-            
-            if (bucketsError) {
-              console.error('🔍 DEBUG: Bucket access error:', bucketsError);
-            }
-
             const { error } = await supabase.storage
               .from('product-images')
               .upload(fileName, image);
 
             if (error) {
-              console.error('🔍 DEBUG: Image upload error:', error);
-              console.warn('تعذر رفع الصورة، سيتم النشر بدون صور');
+              console.warn('تعذر رفع الصورة، سيتم النشر بدون صور:', error);
               continue;
             }
 
@@ -173,7 +161,6 @@ export default function AddProduct() {
               .from('product-images')
               .getPublicUrl(fileName);
             
-            console.log('🔍 DEBUG: Image uploaded successfully:', publicUrl);
             imageUrls.push(publicUrl);
           } catch (imgError) {
             console.error('🔍 DEBUG: Image processing error:', imgError);
@@ -185,130 +172,71 @@ export default function AddProduct() {
       toast.dismiss('upload');
       toast.loading('جاري نشر المنتج...', { id: 'create' });
 
-      console.log('🔍 DEBUG: User from context:', user);
-      console.log('🔍 DEBUG: User from Supabase:', authUser);
+      // Get proper user ID
+      const userId = authUser?.id;
+      if (!userId) {
+        toast.error('خطأ في تحديد هوية المستخدم. يرجى تسجيل الخروج والدخول مرة أخرى.');
+        setLoading(false);
+        return;
+      }
 
-      // Prepare product data
-      const productData = {
+      // Prepare product data using the utility interface
+      const productData: ProductData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         category: formData.category,
-        type: formData.type,
+        type: formData.type as 'sale' | 'rent',
         price: parseFloat(formData.price),
-        location: formData.location || null,
-        contact_phone: formData.contact_phone || null,
-        images: imageUrls.length > 0 ? imageUrls : null,
-        user_id: authUser?.id || user?.userId || user?.email, // Use Supabase user ID
-        user_email: user?.email,
-        status: 'active',
-        created_at: new Date().toISOString()
+        location: formData.location || undefined,
+        contact_phone: formData.contact_phone || undefined,
+        images: imageUrls.length > 0 ? imageUrls : undefined,
+        user_id: userId,
+        user_email: user?.email || authUser?.email,
+        status: 'active'
       };
 
-      console.log('🔍 DEBUG: Product data prepared:', productData);
-
-      // 🔍 ENHANCED: Test database connection first
-      try {
-        const { data: testConnection, error: connectionError } = await supabase
-          .from('marketplace_items')
-          .select('count')
-          .limit(1);
-        
-        console.log('🔍 DEBUG: Database connection test:', { testConnection, connectionError });
-      } catch (connectionTest) {
-        console.log('🔍 DEBUG: Connection test failed:', connectionTest);
-      }
-
-      // Insert product data - try different table names as fallback
-      let insertResult = null;
-      let tableUsed = '';
-      let lastError = null;
-
-      // Try marketplace_items first
-      try {
-        console.log('🔍 DEBUG: Trying marketplace_items table...');
-        const { data, error } = await supabase
-          .from('marketplace_items')
-          .insert(productData)
-          .select();
-        
-        if (!error) {
-          insertResult = data;
-          tableUsed = 'marketplace_items';
-          console.log('🔍 DEBUG: Success with marketplace_items');
-        } else {
-          lastError = error;
-          throw error;
-        }
-      } catch (firstError) {
-        console.log('🔍 DEBUG: marketplace_items failed:', firstError);
-        lastError = firstError;
-        
-        // Fallback to products table
-        try {
-          console.log('🔍 DEBUG: Trying products table...');
-          const { data, error } = await supabase
-            .from('products')
-            .insert(productData)
-            .select();
-          
-          if (!error) {
-            insertResult = data;
-            tableUsed = 'products';
-            console.log('🔍 DEBUG: Success with products');
-          } else {
-            lastError = error;
-            throw error;
-          }
-        } catch (secondError) {
-          console.log('🔍 DEBUG: products failed:', secondError);
-          lastError = secondError;
-          
-          // Fallback to listings table
-          try {
-            console.log('🔍 DEBUG: Trying listings table...');
-            const { data, error } = await supabase
-              .from('listings')
-              .insert(productData)
-              .select();
-            
-            if (error) {
-              lastError = error;
-              throw error;
-            }
-            
-            insertResult = data;
-            tableUsed = 'listings';
-            console.log('🔍 DEBUG: Success with listings');
-          } catch (thirdError) {
-            console.log('🔍 DEBUG: All tables failed:', thirdError);
-            lastError = thirdError;
-            throw thirdError;
-          }
-        }
-      }
+      // Use the robust submission utility
+      const result = await submitProduct(productData);
 
       toast.dismiss('create');
-      toast.success(`تم نشر ${formData.type === 'sale' ? 'منتجك للبيع' : 'منتجك للإيجار'} بنجاح!`);
-      
-      console.log(`🔍 DEBUG: Product inserted successfully into ${tableUsed}:`, insertResult);
 
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        category: '',
-        type: 'sale',
-        price: '',
-        location: '',
-        contact_phone: '',
-        images: []
-      });
-      setImagePreview([]);
+      if (result.success) {
+        toast.success(`تم نشر ${formData.type === 'sale' ? 'منتجك للبيع' : 'منتجك للإيجار'} بنجاح في ${result.table}!`);
+        console.log('🎉 SUCCESS:', result);
 
-      // Navigate to listings after short delay
-      setTimeout(() => {
-        navigate('/public-listings');
-      }, 1500);
+        // Reset form
+        setFormData({
+          title: '',
+          description: '',
+          category: '',
+          type: 'sale',
+          price: '',
+          location: '',
+          contact_phone: '',
+          images: []
+        });
+        setImagePreview([]);
+
+        // Navigate to listings after short delay
+        setTimeout(() => {
+          navigate('/public-listings');
+        }, 1500);
+      } else {
+        console.error('❌ SUBMISSION FAILED:', result);
+        
+        // Show enhanced error message with setup suggestion if needed
+        if (result.debugInfo?.suggestedAction) {
+          const setup = suggestDatabaseSetup();
+          toast.error(
+            `${result.error}\n\n💡 يبدو أن قاعدة البيانات تحتاج إلى إعداد.\nراجع ملف: ${setup.sqlFile}`,
+            { duration: 8000 }
+          );
+          
+          console.log('�️ DATABASE SETUP NEEDED:', setup);
+        } else {
+          toast.error(`فشل في نشر المنتج: ${result.error}`);
+        }
+      }
 
     } catch (error: any) {
       console.error('🔍 DEBUG: Final error caught:', error);
@@ -446,7 +374,7 @@ export default function AddProduct() {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular']"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular'] text-gray-900 bg-white placeholder-gray-500"
                 placeholder={
                   formData.category === 'land' ? 'مثال: أرض زراعية 5 هكتار خصبة' :
                   formData.category === 'equipment' ? 'مثال: جرار زراعي ماسي فيرغسون 2020' :
@@ -512,7 +440,7 @@ export default function AddProduct() {
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular']"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular'] text-gray-900 bg-white"
                 >
                   <option value="">اختر الفئة</option>
                   {categories.map(cat => (
@@ -539,7 +467,7 @@ export default function AddProduct() {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular']"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular'] text-gray-900 bg-white placeholder-gray-500"
                 placeholder="اكتب وصفاً تفصيلياً للمنتج..."
                 required
               />
@@ -556,7 +484,7 @@ export default function AddProduct() {
                   name="price"
                   value={formData.price}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular']"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular'] text-gray-900 bg-white placeholder-gray-500"
                   placeholder="مثال: 500000"
                   required
                 />
@@ -570,7 +498,7 @@ export default function AddProduct() {
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular']"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular'] text-gray-900 bg-white"
                 >
                   <option value="">اختر الولاية</option>
                   {algerianRegions.map(region => (
@@ -590,7 +518,7 @@ export default function AddProduct() {
                 name="contact_phone"
                 value={formData.contact_phone}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular']"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-['NeoSansArabicRegular'] text-gray-900 bg-white placeholder-gray-500"
                 placeholder="مثال: 0555123456"
               />
             </div>
@@ -669,23 +597,49 @@ export default function AddProduct() {
                 إلغاء
               </Button>
               
-              {/* 🔍 Debug Button (Development only) */}
+              {/* 🔍 Debug Buttons (Development only) */}
               {process.env.NODE_ENV === 'development' && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  onClick={async () => {
-                    toast.loading('تشغيل فحص النظام...', { id: 'debug' });
-                    const result = await debugSupabase();
-                    toast.dismiss('debug');
-                    console.log('🔍 FULL DEBUG RESULT:', result);
-                    toast.success('تم الفحص - تحقق من Console');
-                  }}
-                  className="px-6 bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100"
-                >
-                  🔍 فحص
-                </Button>
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    onClick={async () => {
+                      toast.loading('فحص قاعدة البيانات...', { id: 'health-check' });
+                      const health = await checkDatabaseHealth();
+                      toast.dismiss('health-check');
+                      
+                      console.log('🏥 DATABASE HEALTH:', health);
+                      
+                      if (health.healthy) {
+                        toast.success(`قاعدة البيانات تعمل ✅\nالجداول المتوفرة: ${health.availableTables.join(', ')}`);
+                      } else {
+                        toast.error(`مشاكل في قاعدة البيانات ❌\nالأخطاء: ${health.errors.slice(0, 2).join(', ')}`);
+                        const setup = suggestDatabaseSetup();
+                        console.log('🛠️ SETUP SUGGESTION:', setup);
+                      }
+                    }}
+                    className="px-6 bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
+                  >
+                    🏥 فحص قاعدة البيانات
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    onClick={async () => {
+                      toast.loading('تشغيل فحص النظام...', { id: 'debug' });
+                      const result = await debugSupabase();
+                      toast.dismiss('debug');
+                      console.log('🔍 FULL DEBUG RESULT:', result);
+                      toast.success('تم الفحص - تحقق من Console');
+                    }}
+                    className="px-6 bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100"
+                  >
+                    🔍 فحص النظام
+                  </Button>
+                </>
               )}
             </div>
           </form>
