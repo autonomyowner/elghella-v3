@@ -28,8 +28,8 @@ import SystemStatus from "./pages/Debug/SystemStatus";
 // Lazy load improved components for better performance
 const AnalyticsDashboard = lazy(() => import("./pages/Dashboard/AnalyticsDashboard"));
 const SmartRecommendations = lazy(() => import("./pages/AI/SmartRecommendations"));
+const FarmMapPage = lazy(() => import("./pages/FarmMap/FarmMapPage"));
 // TODO: Create these pages
-// const LandMapPage = lazy(() => import("./pages/LandMap/LandMapPage"));
 // const WeatherPage = lazy(() => import("./pages/Weather/WeatherPage"));
 
 // Use existing page components
@@ -137,6 +137,32 @@ function AppRoutes() {
                 element={
                   <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
                     <SmartRecommendations />
+                  </motion.div>
+                } 
+              />
+              
+              {/* 🗺️ Farm Map - Interactive Map for Algeria Agriculture */}
+              <Route 
+                path="/farm-map" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <FarmMapPage />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/land-map" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <FarmMapPage />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/interactive-map" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <FarmMapPage />
                   </motion.div>
                 } 
               />

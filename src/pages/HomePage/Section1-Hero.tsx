@@ -79,8 +79,14 @@ export default function Section1Hero({ id = "hero" }: { id?: string }) {
   const handleSearch = (value: string) => {
     setSearchValue(value);
     
-    // Implement actual search functionality
-    if (value.trim()) {
+    // Check for map-related keywords
+    const mapKeywords = ['خريطة', 'موقع', 'مزرعة', 'أرض', 'مكان', 'map', 'farm', 'location', 'land'];
+    const searchTerm = value.trim().toLowerCase();
+    
+    if (searchTerm && mapKeywords.some(keyword => searchTerm.includes(keyword))) {
+      // Navigate to interactive farm map for location-based searches
+      window.location.href = `/farm-map?search=${encodeURIComponent(value.trim())}`;
+    } else if (searchTerm) {
       // Navigate to public listings with search query
       window.location.href = `/public-listings?search=${encodeURIComponent(value.trim())}`;
     }
@@ -231,6 +237,19 @@ export default function Section1Hero({ id = "hero" }: { id?: string }) {
             >
               استكشف خدماتنا الزراعية
             </Button>
+            
+            {/* NEW: Interactive Map Button */}
+            <Link to="/farm-map">
+              <Button
+                variant="outline"
+                size="lg"
+                className="min-w-[250px] text-lg border-2 border-blue-400 text-blue-300 hover:bg-blue-400 hover:text-white shadow-2xl transform hover:scale-105 transition-all duration-300"
+                leftIcon={<span className="text-xl">🗺️</span>}
+              >
+                الخريطة التفاعلية للمزارع
+              </Button>
+            </Link>
+            
             <Button
               variant="outline"
               size="lg"
