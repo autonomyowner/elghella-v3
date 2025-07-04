@@ -78,8 +78,12 @@ export default function Section1Hero({ id = "hero" }: { id?: string }) {
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
-    // TODO: Implement search functionality
-    console.log("Searching for:", value);
+    
+    // Implement actual search functionality
+    if (value.trim()) {
+      // Navigate to public listings with search query
+      window.location.href = `/public-listings?search=${encodeURIComponent(value.trim())}`;
+    }
   };
 
   const currentImage = heroImages[currentImageIndex];

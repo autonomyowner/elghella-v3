@@ -3,7 +3,7 @@ import { fetchLands } from "../api/LandApi";
 import { supabase } from "../lib/supabaseClient";
 import { Product } from "../api/myProductApi";
 import HeroImage from "../assets/Profile/profile.jpg";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { sendMessage } from "../api/messagesApi";
 import ChatBox from "../components/ChatBox";
@@ -15,12 +15,14 @@ export default function PublicListings() {
   const [lands, setLands] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Filters and search
-  const [search, setSearch] = useState("");
+  
+  // Get search parameters from URL
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get('search') || "");
   const [productType, setProductType] = useState("");
   const [equipmentType, setEquipmentType] = useState("");
   const [landType, setLandType] = useState("");
-  const { user } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [message, setMessage] = useState("");
@@ -97,7 +99,7 @@ export default function PublicListings() {
 
   // Simulate sending a message (replace with backend integration)
   const handleSendMessage = async () => {
-    if (!message.trim() || !user || !user.userId || !selectedPost) return;
+    if (!message.trim() || !isAuthenticated || !user || !user.userId || !selectedPost) return;
     setSending(true);
     setSendError(null);
     try {
@@ -122,7 +124,7 @@ export default function PublicListings() {
   // Delete post handler
   const handleDeletePost = async () => {
     if (!selectedPost) return;
-    if (!user || !user.userId) {
+    if (!isAuthenticated || !user || !user.userId) {
       alert("يجب تسجيل الدخول لحذف منشور.");
       return;
     }
@@ -182,7 +184,9 @@ export default function PublicListings() {
             {/* Message form */}
             <div className="mt-4">
               <h4 className="text-green-300 font-bold mb-2">مراسلة البائع</h4>
-              {user ? (
+              {authLoading ? (
+                <div className="text-gray-400 text-center">جاري التحقق من حالة تسجيل الدخول...</div>
+              ) : isAuthenticated && user ? (
                 !chatOpen ? (
                   <>
                     <textarea

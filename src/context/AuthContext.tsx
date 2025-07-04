@@ -7,6 +7,7 @@ import React, {
   useCallback,
 } from "react";
 import AuthService from "../api/AuthService";
+import { supabase } from "../lib/supabase";
 
 export interface User {
   userId?: string;
@@ -72,7 +73,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setLoading(false);
       }
     };
+    
     restoreSession();
+
+    // 🔄 Listen for auth state changes in real-time
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('🔄 Auth state changed:', event, session?.user?.email);
+        
+        if (event === 'SIGNED_IN' && session?.user) {
+          const formattedUser: User = {
+            userId: session.user.id,
+            name: session.user.user_metadata?.name,
+            email: session.user.email || "",
+            telephone: session.user.user_metadata?.telephone,
+            verified: session.user.email_confirmed_at ? true : false,
+          };
+          setUser(formattedUser);
+          setIsAuthenticated(true);
+          setLoading(false);
+        } else if (event === 'SIGNED_OUT' || !session) {
+          setUser(null);
+          setIsAuthenticated(false);
+          setLoading(false);
+        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          // Update user on token refresh
+          await refreshUser();
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [refreshUser]);
 
   const login = async (email: string, password: string) => {

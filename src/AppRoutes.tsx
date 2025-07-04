@@ -18,6 +18,13 @@ import LoginPage from "./pages/auth/LoginPage";
 import AddProduct from "./pages/AddProduct";
 import UpcomingServices from "./pages/UpcomingServices";
 
+// Specific Marketplace Pages
+import AddEquipment from "./pages/EquipmentPage/AddEquipment";
+import AddLand from "./pages/LandPage/AddLand";
+
+// Debug & System Status
+import SystemStatus from "./pages/Debug/SystemStatus";
+
 // Lazy load improved components for better performance
 const AnalyticsDashboard = lazy(() => import("./pages/Dashboard/AnalyticsDashboard"));
 const SmartRecommendations = lazy(() => import("./pages/AI/SmartRecommendations"));
@@ -191,6 +198,42 @@ function AppRoutes() {
                   </motion.div>
                 } 
               />
+              
+              {/* Specific Marketplace Categories */}
+              <Route 
+                path="/add-equipment" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <AddEquipment />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/add-land" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <AddLand />
+                  </motion.div>
+                } 
+              />
+              
+              {/* Marketplace category aliases */}
+              <Route 
+                path="/equipment" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <AddEquipment />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/land" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <AddLand />
+                  </motion.div>
+                } 
+              />
 
               {/* User Management */}
               <Route 
@@ -232,6 +275,16 @@ function AppRoutes() {
                 element={
                   <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
                     <SeedlingsPage />
+                  </motion.div>
+                } 
+              />
+              
+              {/* 🛠️ SYSTEM DEBUG & STATUS */}
+              <Route 
+                path="/system-status" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <SystemStatus />
                   </motion.div>
                 } 
               />
