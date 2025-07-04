@@ -22,6 +22,13 @@ const FarmMapPage: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [weatherData, setWeatherData] = useState({
+    temperature: '--',
+    humidity: '--',
+    windSpeed: '--',
+    description: '--'
+  });
+  const [isWeatherLoading, setIsWeatherLoading] = useState(true);
   const [farms] = useState<Farm[]>([
     {
       coords: [36.7538, 3.0588],
@@ -66,6 +73,35 @@ const FarmMapPage: React.FC = () => {
   ]);
 
   useEffect(() => {
+    // 🌤️ FETCH LIVE WEATHER DATA
+    const fetchWeatherData = async () => {
+      try {
+        setIsWeatherLoading(true);
+        const API_KEY = '06dbb6c0777805cea0cc1dcbeb83e18c';
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=36.7538&lon=3.0588&appid=${API_KEY}&units=metric&lang=ar`);
+        const data = await response.json();
+        
+        setWeatherData({
+          temperature: `${Math.round(data.main.temp)}°C`,
+          humidity: `${data.main.humidity}%`,
+          windSpeed: `${data.wind.speed} م/ث`,
+          description: data.weather[0].description
+        });
+        
+        console.log('🌤️ Weather data loaded successfully!');
+        setIsWeatherLoading(false);
+      } catch (error) {
+        console.error('خطأ في تحميل بيانات الطقس:', error);
+        setWeatherData({
+          temperature: 'غير متوفر',
+          humidity: 'غير متوفر',
+          windSpeed: 'غير متوفر',
+          description: 'غير متوفر'
+        });
+        setIsWeatherLoading(false);
+      }
+    };
+
     const loadLeaflet = async () => {
       try {
         // Dynamically load Leaflet CSS
@@ -78,7 +114,7 @@ const FarmMapPage: React.FC = () => {
         const script = document.createElement('script');
         script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
         script.onload = () => {
-          initializeMap();
+          initializeMap(fetchWeatherData);
         };
         document.body.appendChild(script);
       } catch (error) {
@@ -87,7 +123,7 @@ const FarmMapPage: React.FC = () => {
       }
     };
 
-    const initializeMap = () => {
+    const initializeMap = (fetchWeatherData: () => void) => {
       if (!mapRef.current || !window.L) return;
 
       try {
@@ -110,14 +146,73 @@ const FarmMapPage: React.FC = () => {
         // Add default layer (OSM)
         osmLayer.addTo(map);
 
-        // Create base layer control
+        // 🌱 SOIL DATA LAYER - ISRIC SoilGrids
+        const soilLayer = window.L.tileLayer.wms('https://maps.isric.org/mapserv', {
+          layers: 'ocd_0-5cm_mean',
+          format: 'image/png',
+          transparent: true,
+          attribution: 'Soil data © ISRIC SoilGrids',
+          opacity: 0.7,
+          styles: '',
+          version: '1.1.1'
+        });
+
+        // 🌤️ WEATHER LAYERS - OpenWeatherMap
+        const API_KEY = '06dbb6c0777805cea0cc1dcbeb83e18c';
+        
+        const precipitationLayer = window.L.tileLayer(`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${API_KEY}`, {
+          attribution: 'Weather data © OpenWeatherMap',
+          opacity: 0.6,
+          maxZoom: 19
+        });
+
+        const temperatureLayer = window.L.tileLayer(`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${API_KEY}`, {
+          attribution: 'Weather data © OpenWeatherMap',
+          opacity: 0.6,
+          maxZoom: 19
+        });
+
+        const windLayer = window.L.tileLayer(`https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${API_KEY}`, {
+          attribution: 'Weather data © OpenWeatherMap',
+          opacity: 0.6,
+          maxZoom: 19
+        });
+
+        const cloudsLayer = window.L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${API_KEY}`, {
+          attribution: 'Weather data © OpenWeatherMap',
+          opacity: 0.6,
+          maxZoom: 19
+        });
+
+        const pressureLayer = window.L.tileLayer(`https://tile.openweathermap.org/map/pressure_new/{z}/{x}/{y}.png?appid=${API_KEY}`, {
+          attribution: 'Weather data © OpenWeatherMap',
+          opacity: 0.6,
+          maxZoom: 19
+        });
+
+        // Create base and overlay layer controls
         const baseLayers = {
           "🗺️ الخريطة العادية": osmLayer,
           "🛰️ صور الأقمار الصناعية": satelliteLayer
         };
 
-        // Add layer control
-        window.L.control.layers(baseLayers).addTo(map);
+        const overlayLayers = {
+          "🌱 كثافة الكربون العضوي (التربة)": soilLayer,
+          "🌧️ هطول الأمطار (مباشر)": precipitationLayer,
+          "🌡️ درجة الحرارة (مباشر)": temperatureLayer,
+          "💨 الرياح (مباشر)": windLayer,
+          "☁️ الغيوم (مباشر)": cloudsLayer,
+          "📊 الضغط الجوي": pressureLayer
+        };
+
+        // Add layer control with overlays
+        const layerControl = window.L.control.layers(baseLayers, overlayLayers, {
+          position: 'topright',
+          collapsed: false
+        }).addTo(map);
+
+        // Add soil layer by default to show it working
+        soilLayer.addTo(map);
 
         // Custom farm icon
         const farmIcon = window.L.divIcon({
@@ -180,6 +275,44 @@ const FarmMapPage: React.FC = () => {
           });
         }
 
+        // Enhanced map click event with soil data info
+        map.on('click', function(e: any) {
+          console.log('📍 Map clicked at: ' + e.latlng);
+          
+          const popup = window.L.popup()
+            .setLatLng(e.latlng)
+            .setContent(`
+              <div style="text-align: center; direction: rtl;">
+                <h4>📍 الموقع المحدد</h4>
+                <p><strong>خط العرض:</strong> ${e.latlng.lat.toFixed(4)}</p>
+                <p><strong>خط الطول:</strong> ${e.latlng.lng.toFixed(4)}</p>
+                <div style="margin-top: 10px; padding: 8px; background: #e3f2fd; border-radius: 5px; font-size: 0.9em;">
+                  💡 فعّل طبقة التربة لرؤية بيانات الكربون العضوي
+                </div>
+              </div>
+            `)
+            .openOn(map);
+        });
+
+        // Layer events for better user experience
+        map.on('overlayadd', function(e: any) {
+          if (e.name.includes('التربة')) {
+            console.log('🌱 Soil layer activated');
+            alert('تم تفعيل طبقة بيانات التربة! انقر على أي مكان في الخريطة لاستكشاف البيانات.');
+          } else if (e.name.includes('مباشر')) {
+            console.log('🌤️ Weather layer activated');
+          }
+        });
+
+        // Fetch weather data
+        fetchWeatherData();
+        
+        // Update weather data every 10 minutes
+        const weatherInterval = setInterval(fetchWeatherData, 600000);
+        
+        // Store interval reference for cleanup
+        (map as any).weatherInterval = weatherInterval;
+
         setIsLoading(false);
       } catch (error) {
         console.error('Error initializing map:', error);
@@ -192,6 +325,10 @@ const FarmMapPage: React.FC = () => {
     // Cleanup
     return () => {
       if (mapInstance.current) {
+        // Clear weather interval
+        if ((mapInstance.current as any).weatherInterval) {
+          clearInterval((mapInstance.current as any).weatherInterval);
+        }
         mapInstance.current.remove();
         mapInstance.current = null;
       }
@@ -287,6 +424,122 @@ const FarmMapPage: React.FC = () => {
                 <h3 className="font-semibold text-gray-800">إدارة المزارع</h3>
                 <p className="text-sm text-gray-600">تتبع حالة المحاصيل والأنشطة الزراعية</p>
               </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-white p-4 rounded-lg shadow-md border-r-4 border-orange-500"
+              >
+                <div className="text-2xl mb-2">🌱</div>
+                <h3 className="font-semibold text-gray-800">بيانات التربة</h3>
+                <p className="text-sm text-gray-600">معلومات كثافة الكربون العضوي</p>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-white p-4 rounded-lg shadow-md border-r-4 border-cyan-500"
+              >
+                <div className="text-2xl mb-2">🌤️</div>
+                <h3 className="font-semibold text-gray-800">معلومات الطقس</h3>
+                <p className="text-sm text-gray-600">بيانات جوية حية ومحدثة</p>
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Weather Information Panel */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-8 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl shadow-2xl overflow-hidden"
+        >
+          <div className="p-6">
+            <h2 className="text-2xl font-bold text-center mb-6">
+              🌤️ معلومات الطقس الحالية - الجزائر العاصمة
+            </h2>
+            
+            {isWeatherLoading ? (
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4 mx-auto"></div>
+                <p>جاري تحميل بيانات الطقس...</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold mb-2">{weatherData.temperature}</div>
+                  <div className="text-sm opacity-80">درجة الحرارة</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold mb-2">{weatherData.humidity}</div>
+                  <div className="text-sm opacity-80">الرطوبة</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold mb-2">{weatherData.windSpeed}</div>
+                  <div className="text-sm opacity-80">سرعة الرياح</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
+                  <div className="text-xl font-bold mb-2">{weatherData.description}</div>
+                  <div className="text-sm opacity-80">وصف الطقس</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Soil Carbon Legend */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mt-8 bg-white rounded-2xl shadow-2xl overflow-hidden"
+        >
+          <div className="p-6">
+            <h2 className="text-2xl font-bold text-center mb-6 text-green-700">
+              🌱 دليل كثافة الكربون العضوي في التربة
+            </h2>
+            
+            <div className="space-y-3">
+              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                <div className="w-8 h-5 bg-amber-900 rounded mr-3 border"></div>
+                <div className="flex-1">
+                  <strong>عالي جداً (&gt; 25 g/kg):</strong> تربة خصبة جداً، مثالية للزراعة الكثيفة
+                </div>
+              </div>
+              
+              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                <div className="w-8 h-5 bg-amber-700 rounded mr-3 border"></div>
+                <div className="flex-1">
+                  <strong>عالي (15-25 g/kg):</strong> تربة خصبة، جيدة للمحاصيل المتنوعة
+                </div>
+              </div>
+              
+              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                <div className="w-8 h-5 bg-amber-500 rounded mr-3 border"></div>
+                <div className="flex-1">
+                  <strong>متوسط (8-15 g/kg):</strong> تربة متوسطة الخصوبة، تحتاج تحسين
+                </div>
+              </div>
+              
+              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                <div className="w-8 h-5 bg-amber-300 rounded mr-3 border"></div>
+                <div className="flex-1">
+                  <strong>منخفض (3-8 g/kg):</strong> تربة ضعيفة، تحتاج تسميد عضوي
+                </div>
+              </div>
+              
+              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                <div className="w-8 h-5 bg-amber-100 rounded mr-3 border"></div>
+                <div className="flex-1">
+                  <strong>منخفض جداً (&lt; 3 g/kg):</strong> تربة غير صالحة للزراعة
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-800">
+                <strong>💡 معلومة مهمة:</strong> الكربون العضوي في التربة مؤشر حيوي لخصوبة الأرض وقدرتها على الاحتفاظ بالماء والمغذيات. 
+                كلما زاد المحتوى العضوي، كانت التربة أكثر صحة وإنتاجية.
+              </p>
             </div>
           </div>
         </motion.div>

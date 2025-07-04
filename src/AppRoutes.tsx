@@ -29,6 +29,7 @@ import SystemStatus from "./pages/Debug/SystemStatus";
 const AnalyticsDashboard = lazy(() => import("./pages/Dashboard/AnalyticsDashboard"));
 const SmartRecommendations = lazy(() => import("./pages/AI/SmartRecommendations"));
 const FarmMapPage = lazy(() => import("./pages/FarmMap/FarmMapPage"));
+const MapGuide = lazy(() => import("./pages/FarmMap/MapGuide"));
 // TODO: Create these pages
 // const WeatherPage = lazy(() => import("./pages/Weather/WeatherPage"));
 
@@ -163,6 +164,14 @@ function AppRoutes() {
                 element={
                   <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
                     <FarmMapPage />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path="/map-guide" 
+                element={
+                  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                    <MapGuide />
                   </motion.div>
                 } 
               />
