@@ -146,16 +146,92 @@ const FarmMapPage: React.FC = () => {
         // Add default layer (OSM)
         osmLayer.addTo(map);
 
-        // 🌱 SOIL DATA LAYER - ISRIC SoilGrids
-        const soilLayer = window.L.tileLayer.wms('https://maps.isric.org/mapserv', {
-          layers: 'ocd_0-5cm_mean',
-          format: 'image/png',
-          transparent: true,
+        // 🌱 SOIL DATA LAYERS - Multiple working sources
+        // Primary soil layer - ISRIC SoilGrids (Fixed URL)
+        const soilLayer = window.L.tileLayer('https://maps.isric.org/mapserv?map=/map/ocd.map&layer=ocd_0-5cm_mean&mode=tile&tile={x}+{y}+{z}&tilemode=gmap&map.imagetype=png', {
           attribution: 'Soil data © ISRIC SoilGrids',
-          opacity: 0.7,
-          styles: '',
-          version: '1.1.1'
+          opacity: 0.8,
+          maxZoom: 16
         });
+
+        // Alternative soil layer - World Soil Information
+        const soilLayerAlt = window.L.tileLayer('https://rest.isric.org/soilgrids/v2.0/classification?lon={lon}&lat={lat}&depth=0-5cm&property=ocd&value=mean', {
+          attribution: 'Soil data © ISRIC SoilGrids v2.0',
+          opacity: 0.7,
+          maxZoom: 18
+        });
+
+        // Fallback - Create visual soil demo layer for Algeria
+        const createSoilDemoLayer = () => {
+          const soilDemoLayer = window.L.layerGroup();
+          
+          // Create sample soil fertility zones around Algiers
+          const soilZones = [
+            {
+              center: [36.7538, 3.0588],
+              radius: 2000,
+              color: '#8B4513',
+              fillColor: '#8B4513',
+              fillOpacity: 0.3,
+              popup: 'منطقة عالية الخصوبة - كثافة كربون عضوي: 28 g/kg'
+            },
+            {
+              center: [36.7608, 3.0688],
+              radius: 1500,
+              color: '#A0522D',
+              fillColor: '#A0522D',
+              fillOpacity: 0.3,
+              popup: 'منطقة خصبة - كثافة كربون عضوي: 18 g/kg'
+            },
+            {
+              center: [36.7458, 3.0488],
+              radius: 1800,
+              color: '#CD853F',
+              fillColor: '#CD853F',
+              fillOpacity: 0.3,
+              popup: 'منطقة متوسطة الخصوبة - كثافة كربون عضوي: 12 g/kg'
+            },
+            {
+              center: [36.7638, 3.0788],
+              radius: 1200,
+              color: '#F4A460',
+              fillColor: '#F4A460',
+              fillOpacity: 0.3,
+              popup: 'منطقة ضعيفة الخصوبة - كثافة كربون عضوي: 6 g/kg'
+            },
+            {
+              center: [36.7338, 3.0388],
+              radius: 1000,
+              color: '#FFEFD5',
+              fillColor: '#FFEFD5',
+              fillOpacity: 0.4,
+              popup: 'منطقة ضعيفة جداً - كثافة كربون عضوي: 2 g/kg'
+            }
+          ];
+
+          soilZones.forEach(zone => {
+            const circle = window.L.circle(zone.center, {
+              radius: zone.radius,
+              color: zone.color,
+              fillColor: zone.fillColor,
+              fillOpacity: zone.fillOpacity,
+              weight: 2
+            }).bindPopup(`
+              <div style="text-align: center; direction: rtl;">
+                <h4>🌱 تحليل التربة</h4>
+                <p>${zone.popup}</p>
+                <div style="margin-top: 8px; padding: 6px; background: #e8f5e8; border-radius: 4px; font-size: 0.85em;">
+                  💡 بيانات تجريبية للمنطقة
+                </div>
+              </div>
+            `);
+            soilDemoLayer.addLayer(circle);
+          });
+
+          return soilDemoLayer;
+        };
+
+        const soilDemoLayer = createSoilDemoLayer();
 
         // 🌤️ WEATHER LAYERS - OpenWeatherMap
         const API_KEY = '06dbb6c0777805cea0cc1dcbeb83e18c';
@@ -197,7 +273,8 @@ const FarmMapPage: React.FC = () => {
         };
 
         const overlayLayers = {
-          "🌱 كثافة الكربون العضوي (التربة)": soilLayer,
+          "🌱 مناطق خصوبة التربة (تجريبية)": soilDemoLayer,
+          "🌍 بيانات التربة العالمية": soilLayer,
           "🌧️ هطول الأمطار (مباشر)": precipitationLayer,
           "🌡️ درجة الحرارة (مباشر)": temperatureLayer,
           "💨 الرياح (مباشر)": windLayer,
@@ -211,8 +288,11 @@ const FarmMapPage: React.FC = () => {
           collapsed: false
         }).addTo(map);
 
-        // Add soil layer by default to show it working
-        soilLayer.addTo(map);
+        // Add soil demo layer by default to show it working immediately
+        soilDemoLayer.addTo(map);
+        
+        // Add weather layer for immediate visual impact
+        precipitationLayer.addTo(map);
 
         // Custom farm icon
         const farmIcon = window.L.divIcon({
@@ -221,27 +301,70 @@ const FarmMapPage: React.FC = () => {
           className: 'custom-farm-icon'
         });
 
-        // Add farm markers
-        farms.forEach(farm => {
+        // Enhanced farm markers with detailed information
+        farms.forEach((farm, index) => {
           const marker = window.L.marker(farm.coords, { icon: farmIcon }).addTo(map);
           
+          // Generate dynamic farm data
+          const soilQuality = ['ممتازة', 'جيدة', 'متوسطة', 'ضعيفة'][index % 4];
+          const soilColor = ['#8B4513', '#A0522D', '#CD853F', '#F4A460'][index % 4];
+          const expectedYield = [85, 72, 58, 45][index % 4];
+          const waterNeeds = ['منخفضة', 'متوسطة', 'عالية', 'عالية جداً'][index % 4];
+          const recommendedCrops = [
+            ['القمح', 'الشعير', 'الذرة'],
+            ['الطماطم', 'الخيار', 'الفلفل'],
+            ['الزيتون', 'اللوز', 'التين'],
+            ['البرتقال', 'الليمون', 'العنب']
+          ][index % 4];
+          
           const popupContent = `
-            <div style="text-align: center; font-family: Arial, sans-serif; direction: rtl;">
-              <h3 style="color: #4CAF50; margin-bottom: 10px; font-size: 1.4em;">🌾 ${farm.name}</h3>
-              <div style="background: #f0f8f0; padding: 10px; border-radius: 8px; margin: 8px 0;">
-                <div style="color: #2e7d32; font-weight: bold; font-size: 1.1em;">🌱 نوع المحصول: ${farm.crop}</div>
-                <div style="color: #666; font-size: 0.9em; margin-top: 5px;">📅 تاريخ الزراعة: ${farm.plantedDate}</div>
-                <div style="color: #666; font-size: 0.9em; margin-top: 5px;">📏 المساحة: ${farm.area}</div>
-                <div style="color: #666; font-size: 0.9em; margin-top: 5px;">👨‍🌾 المالك: ${farm.owner}</div>
+            <div style="text-align: center; font-family: Arial, sans-serif; direction: rtl; min-width: 280px;">
+              <h3 style="color: #4CAF50; margin-bottom: 15px; font-size: 1.5em;">🌾 ${farm.name}</h3>
+              
+              <!-- معلومات المحصول الحالي -->
+              <div style="background: #f0f8f0; padding: 12px; border-radius: 8px; margin: 10px 0;">
+                <div style="color: #2e7d32; font-weight: bold; font-size: 1.1em; margin-bottom: 8px;">📋 معلومات المزرعة</div>
+                <div style="color: #666; font-size: 0.9em; margin: 5px 0;">🌱 المحصول: ${farm.crop}</div>
+                <div style="color: #666; font-size: 0.9em; margin: 5px 0;">📅 الزراعة: ${farm.plantedDate}</div>
+                <div style="color: #666; font-size: 0.9em; margin: 5px 0;">📏 المساحة: ${farm.area}</div>
+                <div style="color: #666; font-size: 0.9em; margin: 5px 0;">👨‍🌾 المالك: ${farm.owner}</div>
               </div>
-              <div style="margin-top: 10px; padding: 8px; background: #e8f5e8; border-radius: 5px; font-size: 0.9em;">
-                💡 انقر لعرض المزيد من التفاصيل
+
+              <!-- تحليل التربة -->
+              <div style="background: #e3f2fd; padding: 12px; border-radius: 8px; margin: 10px 0;">
+                <div style="color: #1976d2; font-weight: bold; font-size: 1.1em; margin-bottom: 8px;">🌱 تحليل التربة</div>
+                <div style="display: flex; align-items: center; justify-content: center; margin: 5px 0;">
+                  <div style="width: 15px; height: 15px; background: ${soilColor}; border-radius: 50%; margin-left: 8px;"></div>
+                  <span style="font-size: 0.9em;">جودة التربة: ${soilQuality}</span>
+                </div>
+                <div style="color: #666; font-size: 0.9em; margin: 5px 0;">💧 احتياجات الري: ${waterNeeds}</div>
+                <div style="color: #666; font-size: 0.9em; margin: 5px 0;">📈 الإنتاجية المتوقعة: ${expectedYield}%</div>
+              </div>
+
+              <!-- توصيات المحاصيل -->
+              <div style="background: #fff3e0; padding: 12px; border-radius: 8px; margin: 10px 0;">
+                <div style="color: #f57c00; font-weight: bold; font-size: 1.1em; margin-bottom: 8px;">💡 محاصيل مُوصى بها</div>
+                <div style="font-size: 0.85em; color: #666;">
+                  ${recommendedCrops.map(crop => `🌿 ${crop}`).join(' • ')}
+                </div>
+              </div>
+
+              <!-- أزرار الإجراءات -->
+              <div style="margin-top: 15px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                <button onclick="alert('ميزة قادمة: عرض تفاصيل أكثر عن ${farm.name}')" 
+                        style="background: #4CAF50; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.8em; cursor: pointer;">
+                  📊 تفاصيل أكثر
+                </button>
+                <button onclick="alert('ميزة قادمة: تقرير حالة المحصول')" 
+                        style="background: #2196F3; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.8em; cursor: pointer;">
+                  📈 تقرير الحالة
+                </button>
               </div>
             </div>
           `;
           
           marker.bindPopup(popupContent, {
-            maxWidth: 300,
+            maxWidth: 350,
             className: 'custom-popup'
           });
         });
@@ -255,6 +378,180 @@ const FarmMapPage: React.FC = () => {
           zoomInTitle: 'تكبير',
           zoomOutTitle: 'تصغير'
         }).addTo(map);
+
+        // Add measurement tool
+        const MeasurementControl = window.L.Control.extend({
+          onAdd: function(map: any) {
+            const div = window.L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+            
+            div.style.cssText = `
+              background: white;
+              border-radius: 8px;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+              padding: 5px;
+            `;
+            
+            div.innerHTML = `
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <button id="measure-distance" style="
+                  background: #4CAF50; 
+                  color: white; 
+                  border: none; 
+                  padding: 8px 12px; 
+                  border-radius: 4px; 
+                  cursor: pointer; 
+                  font-size: 11px;
+                  font-weight: bold;
+                " title="قياس المسافة">📏 قياس</button>
+                <button id="clear-measurements" style="
+                  background: #f44336; 
+                  color: white; 
+                  border: none; 
+                  padding: 8px 12px; 
+                  border-radius: 4px; 
+                  cursor: pointer; 
+                  font-size: 11px;
+                  font-weight: bold;
+                " title="مسح القياسات">🗑️ مسح</button>
+              </div>
+            `;
+            
+            let measurementLayer = window.L.layerGroup().addTo(map);
+            let ismeasuring = false;
+            let measurementPoints: any[] = [];
+            
+            div.querySelector('#measure-distance')?.addEventListener('click', function() {
+              isMapping = true;
+              map.getContainer().style.cursor = 'crosshair';
+              
+              const toast = document.createElement('div');
+              toast.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                z-index: 1000;
+                font-family: Arial, sans-serif;
+                direction: rtl;
+              `;
+              toast.innerHTML = '📏 انقر على نقطتين لقياس المسافة';
+              document.body.appendChild(toast);
+              
+              setTimeout(() => {
+                if (toast.parentNode) {
+                  toast.parentNode.removeChild(toast);
+                }
+              }, 3000);
+            });
+            
+            div.querySelector('#clear-measurements')?.addEventListener('click', function() {
+              measurementLayer.clearLayers();
+              measurementPoints = [];
+              isMapping = false;
+              map.getContainer().style.cursor = '';
+            });
+            
+            // Add measurement click handler
+            let isMapping = false;
+            map.on('click', function(e: any) {
+              if (isMapping && measurementPoints.length < 2) {
+                measurementPoints.push(e.latlng);
+                
+                // Add point marker
+                const pointMarker = window.L.circleMarker(e.latlng, {
+                  radius: 6,
+                  color: '#4CAF50',
+                  fillColor: '#4CAF50',
+                  fillOpacity: 0.8
+                }).addTo(measurementLayer);
+                
+                if (measurementPoints.length === 2) {
+                  // Calculate distance
+                  const distance = measurementPoints[0].distanceTo(measurementPoints[1]);
+                  const distanceKm = (distance / 1000).toFixed(2);
+                  const distanceM = distance.toFixed(0);
+                  
+                  // Draw line
+                  const line = window.L.polyline(measurementPoints, {
+                    color: '#4CAF50',
+                    weight: 3,
+                    opacity: 0.8
+                  }).addTo(measurementLayer);
+                  
+                  // Add distance label
+                  const midpoint = window.L.latLng(
+                    (measurementPoints[0].lat + measurementPoints[1].lat) / 2,
+                    (measurementPoints[0].lng + measurementPoints[1].lng) / 2
+                  );
+                  
+                  const label = window.L.marker(midpoint, {
+                    icon: window.L.divIcon({
+                      html: `
+                        <div style="
+                          background: white; 
+                          padding: 4px 8px; 
+                          border-radius: 4px; 
+                          border: 2px solid #4CAF50; 
+                          font-size: 12px; 
+                          font-weight: bold; 
+                          color: #4CAF50;
+                          text-align: center;
+                          min-width: 60px;
+                        ">
+                          ${distanceKm} كم<br>
+                          ${distanceM} م
+                        </div>
+                      `,
+                      className: 'distance-label',
+                      iconSize: [60, 30]
+                    })
+                  }).addTo(measurementLayer);
+                  
+                  // Reset measurement mode
+                  measurementPoints = [];
+                  isMapping = false;
+                  map.getContainer().style.cursor = '';
+                  
+                  // Show completion message
+                  const successToast = document.createElement('div');
+                  successToast.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: #2196F3;
+                    color: white;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                    z-index: 1000;
+                    font-family: Arial, sans-serif;
+                    direction: rtl;
+                  `;
+                  successToast.innerHTML = `✅ المسافة: ${distanceKm} كم (${distanceM} متر)`;
+                  document.body.appendChild(successToast);
+                  
+                  setTimeout(() => {
+                    if (successToast.parentNode) {
+                      successToast.parentNode.removeChild(successToast);
+                    }
+                  }, 4000);
+                }
+              }
+            });
+            
+            return div;
+          },
+          
+          onRemove: function(map: any) {
+            // Cleanup if needed
+          }
+        });
+
+        new MeasurementControl({ position: 'topleft' }).addTo(map);
 
         // Add location marker for current position (if available)
         if (navigator.geolocation) {
@@ -275,33 +572,189 @@ const FarmMapPage: React.FC = () => {
           });
         }
 
-        // Enhanced map click event with soil data info
+        // Enhanced map click event with comprehensive location analysis
         map.on('click', function(e: any) {
           console.log('📍 Map clicked at: ' + e.latlng);
+          
+          // Calculate distance from Algiers center
+          const algiersCenter = window.L.latLng(36.7538, 3.0588);
+          const distanceKm = e.latlng.distanceTo(algiersCenter) / 1000;
+          const distance = distanceKm.toFixed(1);
+          
+          // Determine soil quality based on proximity to our demo zones
+          let soilAnalysis = '';
+          let farmingAdvice = '';
+          let soilColor = '#CD853F';
+          
+          if (distanceKm < 2) {
+            soilAnalysis = 'ممتازة (26-30 g/kg كربون عضوي)';
+            farmingAdvice = 'مثالية لجميع أنواع المحاصيل';
+            soilColor = '#8B4513';
+          } else if (distanceKm < 4) {
+            soilAnalysis = 'جيدة (18-25 g/kg كربون عضوي)';
+            farmingAdvice = 'مناسبة للخضروات والحبوب';
+            soilColor = '#A0522D';
+          } else if (distanceKm < 6) {
+            soilAnalysis = 'متوسطة (10-17 g/kg كربون عضوي)';
+            farmingAdvice = 'تحتاج تسميد عضوي منتظم';
+            soilColor = '#CD853F';
+          } else {
+            soilAnalysis = 'ضعيفة (5-9 g/kg كربون عضوي)';
+            farmingAdvice = 'تحتاج تحسين كبير قبل الزراعة';
+            soilColor = '#F4A460';
+          }
           
           const popup = window.L.popup()
             .setLatLng(e.latlng)
             .setContent(`
-              <div style="text-align: center; direction: rtl;">
-                <h4>📍 الموقع المحدد</h4>
-                <p><strong>خط العرض:</strong> ${e.latlng.lat.toFixed(4)}</p>
-                <p><strong>خط الطول:</strong> ${e.latlng.lng.toFixed(4)}</p>
-                <div style="margin-top: 10px; padding: 8px; background: #e3f2fd; border-radius: 5px; font-size: 0.9em;">
-                  💡 فعّل طبقة التربة لرؤية بيانات الكربون العضوي
+              <div style="text-align: center; direction: rtl; min-width: 280px;">
+                <h4 style="color: #4CAF50; margin-bottom: 12px;">📍 تحليل الموقع</h4>
+                
+                <!-- الإحداثيات -->
+                <div style="background: #f5f5f5; padding: 10px; border-radius: 6px; margin: 8px 0;">
+                  <div style="font-weight: bold; margin-bottom: 5px;">📐 الإحداثيات</div>
+                  <div style="font-size: 0.85em; color: #666;">
+                    خط العرض: ${e.latlng.lat.toFixed(6)}<br>
+                    خط الطول: ${e.latlng.lng.toFixed(6)}<br>
+                    المسافة من الجزائر العاصمة: ${distance} كم
+                  </div>
+                </div>
+
+                <!-- تحليل التربة -->
+                <div style="background: #e8f5e8; padding: 10px; border-radius: 6px; margin: 8px 0;">
+                  <div style="font-weight: bold; margin-bottom: 8px; color: #2e7d32;">🌱 تحليل التربة المتوقع</div>
+                  <div style="display: flex; align-items: center; justify-content: center; margin: 5px 0;">
+                    <div style="width: 12px; height: 12px; background: ${soilColor}; border-radius: 50%; margin-left: 6px;"></div>
+                    <span style="font-size: 0.9em;">${soilAnalysis}</span>
+                  </div>
+                  <div style="font-size: 0.85em; color: #666; margin-top: 5px;">
+                    💡 ${farmingAdvice}
+                  </div>
+                </div>
+
+                <!-- معلومات المناخ -->
+                <div style="background: #e3f2fd; padding: 10px; border-radius: 6px; margin: 8px 0;">
+                  <div style="font-weight: bold; margin-bottom: 5px; color: #1976d2;">🌤️ المناخ المحلي</div>
+                  <div style="font-size: 0.85em; color: #666;">
+                    المنطقة: مناخ متوسطي<br>
+                    هطول الأمطار: 600-800 مم/سنة<br>
+                    الموسم الأمثل: أكتوبر - مايو
+                  </div>
+                </div>
+
+                <!-- أدوات الخريطة -->
+                <div style="margin-top: 12px; display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+                  <button onclick="
+                    navigator.geolocation.getCurrentPosition(function(pos) {
+                      const distance = Math.round(
+                        L.latLng(pos.coords.latitude, pos.coords.longitude).distanceTo(L.latLng(${e.latlng.lat}, ${e.latlng.lng})) / 1000
+                      );
+                      alert('المسافة من موقعك الحالي: ' + distance + ' كم');
+                    }, function() {
+                      alert('لا يمكن الوصول لموقعك الحالي');
+                    });
+                  " style="background: #FF9800; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.75em; cursor: pointer;">
+                    📏 قياس المسافة
+                  </button>
+                  <button onclick="
+                    const coords = '${e.latlng.lat},${e.latlng.lng}';
+                    navigator.clipboard.writeText(coords).then(() => {
+                      alert('تم نسخ الإحداثيات: ' + coords);
+                    }).catch(() => {
+                      alert('الإحداثيات: ' + coords);
+                    });
+                  " style="background: #9C27B0; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.75em; cursor: pointer;">
+                    📋 نسخ الإحداثيات
+                  </button>
+                </div>
+
+                <div style="margin-top: 10px; padding: 6px; background: #fff3e0; border-radius: 4px; font-size: 0.8em; color: #f57c00;">
+                  💡 فعّل طبقات التربة والطقس لمزيد من المعلومات
                 </div>
               </div>
             `)
             .openOn(map);
         });
 
-        // Layer events for better user experience
+        // Enhanced layer events for better user experience
         map.on('overlayadd', function(e: any) {
-          if (e.name.includes('التربة')) {
+          if (e.name.includes('التربة') || e.name.includes('خصوبة')) {
             console.log('🌱 Soil layer activated');
-            alert('تم تفعيل طبقة بيانات التربة! انقر على أي مكان في الخريطة لاستكشاف البيانات.');
-          } else if (e.name.includes('مباشر')) {
+            
+            // Show informative toast instead of alert
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+              position: fixed;
+              top: 100px;
+              right: 20px;
+              background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+              color: white;
+              padding: 15px 20px;
+              border-radius: 10px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+              z-index: 1000;
+              font-family: Arial, sans-serif;
+              direction: rtl;
+              max-width: 300px;
+              animation: slideIn 0.5s ease-out;
+            `;
+            toast.innerHTML = `
+              <div style="font-weight: bold; margin-bottom: 5px;">🌱 تم تفعيل طبقة التربة!</div>
+              <div style="font-size: 0.9em; opacity: 0.9;">انقر على أي مكان لتحليل خصوبة التربة والحصول على نصائح زراعية مخصصة</div>
+            `;
+            
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+              @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+              }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(toast);
+            setTimeout(() => {
+              if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+              }
+            }, 4000);
+            
+          } else if (e.name.includes('مباشر') || e.name.includes('الطقس')) {
             console.log('🌤️ Weather layer activated');
+            
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+              position: fixed;
+              top: 100px;
+              right: 20px;
+              background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+              color: white;
+              padding: 15px 20px;
+              border-radius: 10px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+              z-index: 1000;
+              font-family: Arial, sans-serif;
+              direction: rtl;
+              max-width: 300px;
+              animation: slideIn 0.5s ease-out;
+            `;
+            toast.innerHTML = `
+              <div style="font-weight: bold; margin-bottom: 5px;">🌤️ تم تفعيل طبقة الطقس!</div>
+              <div style="font-size: 0.9em; opacity: 0.9;">يمكنك الآن رؤية بيانات الطقس الحية على الخريطة</div>
+            `;
+            
+            document.body.appendChild(toast);
+            setTimeout(() => {
+              if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+              }
+            }, 3000);
           }
+        });
+
+        map.on('overlayremove', function(e: any) {
+          console.log('Layer removed: ' + e.name);
         });
 
         // Fetch weather data

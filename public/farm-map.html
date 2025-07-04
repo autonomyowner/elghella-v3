@@ -386,12 +386,84 @@
             "🛰️ صور الأقمار الصناعية": satelliteLayer
         };
 
+        // 🌱 CREATE VISIBLE SOIL DEMO LAYER
+        const createSoilDemoLayer = () => {
+            const soilDemoLayer = L.layerGroup();
+            
+            const soilZones = [
+                {
+                    center: [36.7538, 3.0588],
+                    radius: 2000,
+                    color: '#8B4513',
+                    fillColor: '#8B4513',
+                    fillOpacity: 0.3,
+                    popup: 'منطقة عالية الخصوبة - كثافة كربون عضوي: 28 g/kg'
+                },
+                {
+                    center: [36.7608, 3.0688],
+                    radius: 1500,
+                    color: '#A0522D',
+                    fillColor: '#A0522D',
+                    fillOpacity: 0.3,
+                    popup: 'منطقة خصبة - كثافة كربون عضوي: 18 g/kg'
+                },
+                {
+                    center: [36.7458, 3.0488],
+                    radius: 1800,
+                    color: '#CD853F',
+                    fillColor: '#CD853F',
+                    fillOpacity: 0.3,
+                    popup: 'منطقة متوسطة الخصوبة - كثافة كربون عضوي: 12 g/kg'
+                },
+                {
+                    center: [36.7638, 3.0788],
+                    radius: 1200,
+                    color: '#F4A460',
+                    fillColor: '#F4A460',
+                    fillOpacity: 0.3,
+                    popup: 'منطقة ضعيفة الخصوبة - كثافة كربون عضوي: 6 g/kg'
+                },
+                {
+                    center: [36.7338, 3.0388],
+                    radius: 1000,
+                    color: '#FFEFD5',
+                    fillColor: '#FFEFD5',
+                    fillOpacity: 0.4,
+                    popup: 'منطقة ضعيفة جداً - كثافة كربون عضوي: 2 g/kg'
+                }
+            ];
+
+            soilZones.forEach(zone => {
+                const circle = L.circle(zone.center, {
+                    radius: zone.radius,
+                    color: zone.color,
+                    fillColor: zone.fillColor,
+                    fillOpacity: zone.fillOpacity,
+                    weight: 2
+                }).bindPopup(`
+                    <div style="text-align: center; direction: rtl;">
+                        <h4>🌱 تحليل التربة</h4>
+                        <p>${zone.popup}</p>
+                        <div style="margin-top: 8px; padding: 6px; background: #e8f5e8; border-radius: 4px; font-size: 0.85em;">
+                            💡 بيانات تجريبية للمنطقة
+                        </div>
+                    </div>
+                `);
+                soilDemoLayer.addLayer(circle);
+            });
+
+            return soilDemoLayer;
+        };
+
+        const soilDemoLayer = createSoilDemoLayer();
+
         const overlayLayers = {
-            "🌱 كثافة الكربون العضوي في التربة": soilLayer,
-            "🌧️ هطول الأمطار": precipitationLayer,
-            "🌡️ درجة الحرارة": temperatureLayer,
-            "💨 الرياح": windLayer,
-            "☁️ الغيوم": cloudsLayer
+            "🌱 مناطق خصوبة التربة (تجريبية)": soilDemoLayer,
+            "� بيانات التربة العالمية": soilLayer,
+            "�🌧️ هطول الأمطار (مباشر)": precipitationLayer,
+            "🌡️ درجة الحرارة (مباشر)": temperatureLayer,
+            "💨 الرياح (مباشر)": windLayer,
+            "☁️ الغيوم (مباشر)": cloudsLayer
         };
 
         // Add layer control with overlays
@@ -399,6 +471,12 @@
             position: 'topright',
             collapsed: false
         }).addTo(map);
+
+        // Add demo soil layer by default so users see it immediately!
+        soilDemoLayer.addTo(map);
+        
+        // Also add precipitation layer for immediate visual impact
+        precipitationLayer.addTo(map);
 
         // Custom farm icon
         const farmIcon = L.divIcon({
