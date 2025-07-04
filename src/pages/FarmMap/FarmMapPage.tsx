@@ -30,6 +30,7 @@ const FarmMapPage: React.FC = () => {
   });
   const [isWeatherLoading, setIsWeatherLoading] = useState(true);
   const [farms] = useState<Farm[]>([
+    // الجزائر العاصمة وضواحيها
     {
       coords: [36.7538, 3.0588],
       name: "مزرعة الأمل",
@@ -46,29 +47,74 @@ const FarmMapPage: React.FC = () => {
       area: "8 هكتار",
       owner: "فاطمة بن علي"
     },
+    // وهران - الغرب الجزائري
     {
-      coords: [36.7458, 3.0488],
-      name: "مزرعة النجاح",
-      crop: "الطماطم",
-      plantedDate: "أبريل 2024",
-      area: "3 هكتار",
-      owner: "عبد الرحمن محمود"
+      coords: [35.6976, -0.6337],
+      name: "بساتين وهران",
+      crop: "الحمضيات",
+      plantedDate: "فبراير 2024",
+      area: "18 هكتار",
+      owner: "خالد الوهراني"
     },
     {
-      coords: [36.7638, 3.0788],
-      name: "حقل البركة",
+      coords: [35.7589, -0.5419],
+      name: "مزرعة السهول الغربية",
+      crop: "البطاطس",
+      plantedDate: "سبتمبر 2024",
+      area: "25 هكتار",
+      owner: "نورة بنت علي"
+    },
+    // قسنطينة - الشرق الجزائري
+    {
+      coords: [36.3650, 6.6147],
+      name: "مزارع قسنطينة",
+      crop: "الشعير",
+      plantedDate: "أغسطس 2024",
+      area: "22 هكتار",
+      owner: "محمد القسنطيني"
+    },
+    {
+      coords: [36.4681, 6.7648],
+      name: "حقول الذرة الشرقية",
       crop: "الذرة",
       plantedDate: "مايو 2024",
-      area: "12 هكتار",
-      owner: "خديجة يوسف"
+      area: "16 هكتار",
+      owner: "عائشة الهواري"
+    },
+    // ورقلة - الجنوب الجزائري
+    {
+      coords: [31.9447, 5.3317],
+      name: "واحة ورقلة",
+      crop: "التمر",
+      plantedDate: "مارس 2020",
+      area: "35 هكتار",
+      owner: "عبد الله الصحراوي"
     },
     {
-      coords: [36.7338, 3.0388],
-      name: "مزرعة الخير",
-      crop: "البرتقال",
-      plantedDate: "نوفمبر 2021",
-      area: "6 هكتار",
-      owner: "أحمد العربي"
+      coords: [32.1234, 5.4567],
+      name: "مزرعة النخيل الجنوبية",
+      crop: "النخيل",
+      plantedDate: "نوفمبر 2019",
+      area: "28 هكتار",
+      owner: "حليمة بنت سعد"
+    },
+    // تيارت - الهضاب العليا
+    {
+      coords: [35.3711, 1.3170],
+      name: "مزارع تيارت",
+      crop: "القمح الصلب",
+      plantedDate: "نوفمبر 2024",
+      area: "30 هكتار",
+      owner: "سليم التياري"
+    },
+    // سطيف - الشرق الأوسط
+    {
+      coords: [36.1905, 5.4133],
+      name: "حقول سطيف",
+      crop: "العدس",
+      plantedDate: "أكتوبر 2024",
+      area: "14 هكتار",
+      owner: "زينب السطايفية"
     }
   ]);
 
@@ -196,8 +242,11 @@ const FarmMapPage: React.FC = () => {
       if (!mapRef.current || !window.L) return;
 
       try {
-        // Initialize map centered on Algiers, Algeria
-        const map = window.L.map(mapRef.current).setView([36.7538, 3.0588], 13);
+        // Initialize map centered on Algeria (broader view)
+        const map = window.L.map(mapRef.current).setView([28.0339, 1.6596], 6);
+        
+        // Set loading to false immediately after map creation
+        setIsLoading(false);
         mapInstance.current = map;
 
         // Define base layers
@@ -212,10 +261,13 @@ const FarmMapPage: React.FC = () => {
           maxZoom: 19
         });
 
-        // Add default layer (OSM)
+        // Add default layer (OSM) and set loading complete
         osmLayer.addTo(map);
+        
+        // Map is now ready - all other layers load in background
+        console.log('🗺️ Base map loaded successfully');
 
-        // 🌱 SOIL DATA LAYERS - Multiple working sources
+        // 🌱 SOIL DATA LAYERS - Multiple working sources (loaded in background)
         // Primary soil layer - ISRIC SoilGrids (Fixed URL)
         const soilLayer = window.L.tileLayer('https://maps.isric.org/mapserv?map=/map/ocd.map&layer=ocd_0-5cm_mean&mode=tile&tile={x}+{y}+{z}&tilemode=gmap&map.imagetype=png', {
           attribution: 'Soil data © ISRIC SoilGrids',
@@ -984,9 +1036,9 @@ const FarmMapPage: React.FC = () => {
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 🗺️ خريطة المزارع التفاعلية
               </h1>
-              <p className="text-xl opacity-90">
-                استكشف المزارع والحقول الزراعية في منطقة الجزائر العاصمة
-              </p>
+                             <p className="text-xl opacity-90">
+                 استكشف المزارع والحقول الزراعية في جميع أنحاء الجزائر
+               </p>
             </div>
             
             {/* Expertise Integration Button */}

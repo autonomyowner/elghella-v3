@@ -222,7 +222,7 @@
         <!-- Info Panel -->
         <div class="info-panel">
             <h2>🗺️ خريطة المزارع التفاعلية</h2>
-            <p>استكشف المزارع والحقول الزراعية في منطقة الجزائر العاصمة</p>
+            <p>استكشف المزارع والحقول الزراعية في جميع أنحاء الجزائر</p>
             
             <div class="features">
                 <div class="feature">
@@ -325,8 +325,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
-        // Initialize map centered on Algiers, Algeria
-        const map = L.map('map').setView([36.7538, 3.0588], 13);
+        // Initialize map centered on Algeria (broader view)
+        const map = L.map('map').setView([28.0339, 1.6596], 6);
 
         // Define base layers
         const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
