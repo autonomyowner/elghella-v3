@@ -896,13 +896,52 @@ const FarmMapPage: React.FC = () => {
         // Fetch weather data
         fetchWeatherData();
         
-        // Update weather data every 10 minutes
-        const weatherInterval = setInterval(fetchWeatherData, 600000);
+        // Check for expertise page integration parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const feature = urlParams.get('feature');
+        const source = urlParams.get('source');
         
-        // Store interval reference for cleanup
-        (map as any).weatherInterval = weatherInterval;
+        if (source === 'expertise') {
+          // Show welcome message from expertise page
+          setTimeout(() => {
+            const welcomeToast = document.createElement('div');
+            welcomeToast.style.cssText = `
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              background: linear-gradient(135deg, #4CAF50, #2196F3);
+              color: white;
+              padding: 15px 20px;
+              border-radius: 12px;
+              box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+              z-index: 1000;
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              max-width: 300px;
+              direction: rtl;
+            `;
+            welcomeToast.innerHTML = `
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span style="font-size: 20px;">🧠</span>
+                <strong>مرحباً من صفحة الاستشارات!</strong>
+              </div>
+              <div style="font-size: 12px; opacity: 0.9;">
+                ${feature ? getFeatureMessage(feature) : 'استكشف الخريطة التفاعلية للحصول على تحليل شامل لمزرعتك'}
+              </div>
+            `;
+            document.body.appendChild(welcomeToast);
+            
+            setTimeout(() => {
+              if (welcomeToast.parentNode) {
+                welcomeToast.parentNode.removeChild(welcomeToast);
+              }
+            }, 6000);
+          }, 1000);
+        }
 
-        setIsLoading(false);
+        // Refresh weather every 10 minutes
+        const interval = setInterval(fetchWeatherData, 10 * 60 * 1000);
+        return () => clearInterval(interval);
       } catch (error) {
         console.error('Error initializing map:', error);
         setIsLoading(false);
@@ -914,15 +953,22 @@ const FarmMapPage: React.FC = () => {
     // Cleanup
     return () => {
       if (mapInstance.current) {
-        // Clear weather interval
-        if ((mapInstance.current as any).weatherInterval) {
-          clearInterval((mapInstance.current as any).weatherInterval);
-        }
         mapInstance.current.remove();
         mapInstance.current = null;
       }
     };
-  }, [farms]);
+  }, []);
+
+  // Helper function to get feature-specific messages
+  const getFeatureMessage = (feature: string) => {
+    const messages: { [key: string]: string } = {
+      'crop-analysis': '🌾 اكتشف صحة محاصيلك باستخدام أدوات التحليل التفاعلية',
+      'soil-analysis': '🌱 شاهد بيانات التربة وخصوبتها في مزرعتك',
+      'weather-data': '🌤️ اطلع على بيانات الطقس المباشرة لمنطقتك',
+      'custom-maps': '🗺️ أنشئ خرائط مخصصة لتحليل مزرعتك'
+    };
+    return messages[feature] || 'استكشف الأدوات التفاعلية للتحليل الزراعي';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
@@ -932,13 +978,32 @@ const FarmMapPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="bg-gradient-to-r from-green-600 to-green-700 text-white py-16"
       >
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            🗺️ خريطة المزارع التفاعلية
-          </h1>
-          <p className="text-xl opacity-90">
-            استكشف المزارع والحقول الزراعية في منطقة الجزائر العاصمة
-          </p>
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col lg:flex-row justify-between items-center">
+            <div className="text-center lg:text-right mb-6 lg:mb-0">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                🗺️ خريطة المزارع التفاعلية
+              </h1>
+              <p className="text-xl opacity-90">
+                استكشف المزارع والحقول الزراعية في منطقة الجزائر العاصمة
+              </p>
+            </div>
+            
+            {/* Expertise Integration Button */}
+            <div className="flex flex-col items-center gap-3">
+              <button
+                onClick={() => window.location.href = '/expertise'}
+                className="bg-white text-green-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition-all duration-300 flex items-center gap-2 text-sm font-semibold shadow-lg transform hover:scale-105"
+              >
+                <span className="text-lg">🧠</span>
+                استشارة مع خبير زراعي
+              </button>
+              
+              <div className="text-xs text-green-100 max-w-[200px] text-center">
+                احصل على استشارة مهنية مع التحليل التفاعلي
+              </div>
+            </div>
+          </div>
         </div>
       </motion.div>
 

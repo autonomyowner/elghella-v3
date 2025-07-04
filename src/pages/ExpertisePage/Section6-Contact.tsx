@@ -259,6 +259,41 @@ export default function Section6Contact() {
                 <li>✓ نتائج مضمونة</li>
               </ul>
             </div>
+
+            {/* NEW: Map Integration Section */}
+            <div className="bg-gradient-to-r from-blue-500/20 to-green-500/20 backdrop-blur-sm rounded-2xl p-8 text-white border border-white/20">
+              <h4 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ fontFamily: "'NeoSansArabicBold', sans-serif" }}>
+                <span className="text-2xl">🗺️</span>
+                الخريطة التفاعلية
+              </h4>
+              <p className="opacity-90 mb-4 text-sm">
+                استخدم خريطتنا التفاعلية لتحليل مزرعتك قبل أو بعد الاستشارة
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-lg">🛰️</span>
+                  <span>صور فضائية عالية الدقة</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-lg">🌱</span>
+                  <span>تحليل خصوبة التربة</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-lg">🌤️</span>
+                  <span>بيانات الطقس المباشرة</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-lg">📏</span>
+                  <span>قياس المسافات والمساحات</span>
+                </div>
+              </div>
+              <button
+                onClick={() => window.location.href = '/farm-map?source=expertise-contact'}
+                className="w-full mt-4 bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-300 text-sm font-semibold border border-white/30"
+              >
+                🗺️ جرب الخريطة التفاعلية الآن
+              </button>
+            </div>
           </motion.div>
         </div>
       </div>

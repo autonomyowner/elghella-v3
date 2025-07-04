@@ -149,6 +149,16 @@ export default function Section4Services() {
                     </span>
                   </div>
                 ))}
+                
+                {/* Add Map Integration for each service */}
+                {service.popular && (
+                  <div className="flex items-start gap-3 text-right mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <span className="text-blue-600 mt-0.5">🗺️</span>
+                    <span className="text-blue-800 text-sm font-medium" style={{ fontFamily: "'NeoSansArabicRegular', sans-serif" }}>
+                      تحليل تفاعلي مع الخريطة الذكية
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* CTA Button */}
@@ -201,6 +211,26 @@ export default function Section4Services() {
                 </p>
               </motion.div>
             ))}
+          </div>
+          
+          {/* Add Map Integration Note */}
+          <div className="mt-12 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 border border-blue-200">
+            <div className="text-center">
+              <h4 className="text-lg font-bold text-gray-800 mb-3 flex items-center justify-center gap-2" style={{ fontFamily: "'NeoSansArabicBold', sans-serif" }}>
+                <span className="text-2xl">🗺️</span>
+                التحليل التفاعلي مع كل استشارة
+              </h4>
+              <p className="text-gray-600 mb-4" style={{ fontFamily: "'NeoSansArabicRegular', sans-serif" }}>
+                جميع خدماتنا تتضمن إمكانية الوصول للخريطة التفاعلية لتحليل مزرعتك بصرياً
+              </p>
+              <button
+                onClick={() => window.location.href = '/farm-map?source=expertise-services'}
+                className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-green-600 transition-all duration-300 text-sm font-semibold flex items-center gap-2 mx-auto"
+              >
+                <span className="text-lg">🛰️</span>
+                استكشف الخريطة التفاعلية
+              </button>
+            </div>
           </div>
         </motion.div>
       </div>
