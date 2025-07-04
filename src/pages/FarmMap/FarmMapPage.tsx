@@ -1088,71 +1088,149 @@ const FarmMapPage: React.FC = () => {
             />
           </div>
 
-          {/* Features Panel */}
+          {/* Enhanced Features Guide Panel */}
           <div className="p-6 bg-gray-50">
             <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
-              ✨ ميزات الخريطة التفاعلية
+              🌱 دليل استخدام الخريطة التفاعلية
             </h2>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Main Features Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="bg-white p-4 rounded-lg shadow-md border-r-4 border-green-500"
+                className="bg-white p-5 rounded-lg shadow-md border-r-4 border-green-500"
               >
-                <div className="text-2xl mb-2">🌍</div>
-                <h3 className="font-semibold text-gray-800">عرض الخريطة</h3>
-                <p className="text-sm text-gray-600">تبديل بين الخريطة العادية والقمر الصناعي</p>
+                <div className="text-2xl mb-3">🌍</div>
+                <h3 className="font-semibold text-gray-800 mb-2">عرض الخريطة</h3>
+                <p className="text-sm text-gray-600 mb-3">تبديل بين الخريطة العادية والقمر الصناعي</p>
+                <div className="text-xs bg-green-50 p-2 rounded">
+                  <strong>💡 نصيحة:</strong> استخدم الخريطة الساتلية لرؤية حالة المحاصيل الفعلية
+                </div>
               </motion.div>
 
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="bg-white p-4 rounded-lg shadow-md border-r-4 border-blue-500"
+                className="bg-white p-5 rounded-lg shadow-md border-r-4 border-blue-500"
               >
-                <div className="text-2xl mb-2">📍</div>
-                <h3 className="font-semibold text-gray-800">مواقع المزارع</h3>
-                <p className="text-sm text-gray-600">انقر على العلامات لعرض تفاصيل المحاصيل</p>
+                <div className="text-2xl mb-3">📍</div>
+                <h3 className="font-semibold text-gray-800 mb-2">مواقع المزارع</h3>
+                <p className="text-sm text-gray-600 mb-3">انقر على العلامات لعرض تفاصيل شاملة</p>
+                <div className="text-xs bg-blue-50 p-2 rounded">
+                  <strong>📊 البيانات:</strong> نوع المحصول، تاريخ الزراعة، المساحة، المالك
+                </div>
               </motion.div>
 
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="bg-white p-4 rounded-lg shadow-md border-r-4 border-yellow-500"
+                className="bg-white p-5 rounded-lg shadow-md border-r-4 border-yellow-500"
               >
-                <div className="text-2xl mb-2">🌾</div>
-                <h3 className="font-semibold text-gray-800">معلومات المحاصيل</h3>
-                <p className="text-sm text-gray-600">نوع المحصول وتاريخ الزراعة</p>
+                <div className="text-2xl mb-3">🌾</div>
+                <h3 className="font-semibold text-gray-800 mb-2">تحليل المحاصيل</h3>
+                <p className="text-sm text-gray-600 mb-3">معلومات مفصلة عن صحة وإنتاجية المحاصيل</p>
+                <div className="text-xs bg-yellow-50 p-2 rounded">
+                  <strong>🎯 الهدف:</strong> تحسين الإنتاجية وتقليل التكاليف
+                </div>
               </motion.div>
 
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="bg-white p-4 rounded-lg shadow-md border-r-4 border-purple-500"
+                className="bg-white p-5 rounded-lg shadow-md border-r-4 border-purple-500"
               >
-                <div className="text-2xl mb-2">🚜</div>
-                <h3 className="font-semibold text-gray-800">إدارة المزارع</h3>
-                <p className="text-sm text-gray-600">تتبع حالة المحاصيل والأنشطة الزراعية</p>
+                <div className="text-2xl mb-3">🌱</div>
+                <h3 className="font-semibold text-gray-800 mb-2">بيانات التربة</h3>
+                <p className="text-sm text-gray-600 mb-3">كثافة الكربون العضوي ومؤشرات الخصوبة</p>
+                <div className="text-xs bg-purple-50 p-2 rounded">
+                  <strong>📈 التقييم:</strong> من ضعيف جداً إلى ممتاز (حسب g/kg)
+                </div>
               </motion.div>
 
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="bg-white p-4 rounded-lg shadow-md border-r-4 border-orange-500"
+                className="bg-white p-5 rounded-lg shadow-md border-r-4 border-cyan-500"
               >
-                <div className="text-2xl mb-2">🌱</div>
-                <h3 className="font-semibold text-gray-800">بيانات التربة</h3>
-                <p className="text-sm text-gray-600">معلومات كثافة الكربون العضوي</p>
+                <div className="text-2xl mb-3">�️</div>
+                <h3 className="font-semibold text-gray-800 mb-2">معلومات الطقس</h3>
+                <p className="text-sm text-gray-600 mb-3">بيانات حية مع نصائح زراعية</p>
+                <div className="text-xs bg-cyan-50 p-2 rounded">
+                  <strong>⏰ التحديث:</strong> كل 10 دقائق من OpenWeatherMap
+                </div>
               </motion.div>
 
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="bg-white p-4 rounded-lg shadow-md border-r-4 border-cyan-500"
+                className="bg-white p-5 rounded-lg shadow-md border-r-4 border-red-500"
               >
-                <div className="text-2xl mb-2">🌤️</div>
-                <h3 className="font-semibold text-gray-800">معلومات الطقس</h3>
-                <p className="text-sm text-gray-600">بيانات جوية حية ومحدثة</p>
+                <div className="text-2xl mb-3">📏</div>
+                <h3 className="font-semibold text-gray-800 mb-2">أدوات القياس</h3>
+                <p className="text-sm text-gray-600 mb-3">قياس المسافات ونسخ الإحداثيات</p>
+                <div className="text-xs bg-red-50 p-2 rounded">
+                  <strong>⚡ سريع:</strong> انقر مرتين لقياس المسافة بدقة
+                </div>
               </motion.div>
+            </div>
+
+            {/* Quick Start Guide */}
+            <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white p-6 rounded-lg">
+              <h3 className="text-lg font-bold mb-4 text-center">🚀 دليل البداية السريعة</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                <div>
+                  <h4 className="font-semibold mb-2 flex items-center">
+                    <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">1</span>
+                    استكشف الطبقات
+                  </h4>
+                  <p className="text-white/90 mb-3">استخدم قائمة الطبقات (أعلى يمين الخريطة) لتفعيل بيانات التربة والطقس</p>
+                  
+                  <h4 className="font-semibold mb-2 flex items-center">
+                    <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">2</span>
+                    تفاعل مع الخريطة
+                  </h4>
+                  <p className="text-white/90">انقر في أي مكان للحصول على تحليل شامل للموقع والتربة</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2 flex items-center">
+                    <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">3</span>
+                    اكتشف المزارع
+                  </h4>
+                  <p className="text-white/90 mb-3">انقر على أيقونات المزارع 🌾 لرؤية معلومات مفصلة</p>
+                  
+                  <h4 className="font-semibold mb-2 flex items-center">
+                    <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">4</span>
+                    استخدم الأدوات
+                  </h4>
+                  <p className="text-white/90">استفد من أدوات القياس ونسخ الإحداثيات وتحليل المسافات</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Pro Tips */}
+            <div className="mt-6 bg-white border border-orange-200 rounded-lg p-4">
+              <h3 className="text-lg font-bold text-orange-600 mb-3 flex items-center">
+                <span className="text-xl mr-2">💡</span>
+                نصائح المحترفين
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="flex items-start">
+                  <span className="text-orange-500 mr-2">🎯</span>
+                  <span><strong>لأفضل نتائج:</strong> استخدم طبقة الساتل مع بيانات التربة معاً</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-orange-500 mr-2">⚡</span>
+                  <span><strong>للسرعة:</strong> اطلع على الطقس قبل التخطيط للأنشطة الزراعية</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-orange-500 mr-2">🔍</span>
+                  <span><strong>للدقة:</strong> استخدم أداة القياس لحساب مساحات الحقول</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-orange-500 mr-2">📱</span>
+                  <span><strong>للمشاركة:</strong> انسخ الإحداثيات لمشاركة المواقع مع الآخرين</span>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Weather Information Panel */}
+        {/* Weather Information Panel with Guide */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1161,7 +1239,7 @@ const FarmMapPage: React.FC = () => {
         >
           <div className="p-6">
             <h2 className="text-2xl font-bold text-center mb-6">
-              🌤️ معلومات الطقس الحالية - الجزائر العاصمة
+              🌤️ دليل معلومات الطقس الحالية - الجزائر
             </h2>
             
             {isWeatherLoading ? (
@@ -1170,25 +1248,233 @@ const FarmMapPage: React.FC = () => {
                 <p>جاري تحميل بيانات الطقس...</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold mb-2">{weatherData.temperature}</div>
-                  <div className="text-sm opacity-80">درجة الحرارة</div>
+              <>
+                {/* Current Weather Data */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
+                    <div className="text-2xl font-bold mb-2">{weatherData.temperature}</div>
+                    <div className="text-sm opacity-80">درجة الحرارة</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
+                    <div className="text-2xl font-bold mb-2">{weatherData.humidity}</div>
+                    <div className="text-sm opacity-80">الرطوبة</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
+                    <div className="text-2xl font-bold mb-2">{weatherData.windSpeed}</div>
+                    <div className="text-sm opacity-80">سرعة الرياح</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
+                    <div className="text-xl font-bold mb-2">{weatherData.description}</div>
+                    <div className="text-sm opacity-80">وصف الطقس</div>
+                  </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold mb-2">{weatherData.humidity}</div>
-                  <div className="text-sm opacity-80">الرطوبة</div>
+
+                {/* Weather Guide */}
+                <div className="bg-white/10 backdrop-blur-sm p-5 rounded-lg">
+                  <h3 className="text-lg font-bold mb-4 text-center">📊 دليل قراءة بيانات الطقس للمزارعين</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div>
+                      <div className="font-semibold mb-3 flex items-center">
+                        <span className="text-lg mr-2">🌡️</span>
+                        درجة الحرارة المثلى للمحاصيل:
+                      </div>
+                      <div className="space-y-2 bg-white/5 p-3 rounded">
+                        <div className="flex justify-between">
+                          <span>• القمح:</span>
+                          <span className="font-semibold">15-20°C</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>• الطماطم:</span>
+                          <span className="font-semibold">20-25°C</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>• الزيتون:</span>
+                          <span className="font-semibold">15-30°C</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>• النخيل:</span>
+                          <span className="font-semibold">25-35°C</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="font-semibold mb-3 flex items-center">
+                        <span className="text-lg mr-2">💧</span>
+                        مؤشر الرطوبة والري:
+                      </div>
+                      <div className="space-y-2 bg-white/5 p-3 rounded">
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-red-400 rounded-full mr-2"></div>
+                          <span>أقل من 30%: ري مكثف مطلوب</span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-yellow-400 rounded-full mr-2"></div>
+                          <span>30-60%: ري معتدل</span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
+                          <span>60-80%: ري خفيف</span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-blue-400 rounded-full mr-2"></div>
+                          <span>أكثر من 80%: تهوية مطلوبة</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="font-semibold mb-3 flex items-center">
+                        <span className="text-lg mr-2">💨</span>
+                        تأثير الرياح على الزراعة:
+                      </div>
+                      <div className="space-y-2 bg-white/5 p-3 rounded">
+                        <div>• <strong>أقل من 2 م/ث:</strong> مثالي للزراعة</div>
+                        <div>• <strong>2-5 م/ث:</strong> جيد للتلقيح الطبيعي</div>
+                        <div>• <strong>5-10 م/ث:</strong> قد يؤثر على النباتات الصغيرة</div>
+                        <div>• <strong>أكثر من 10 م/ث:</strong> ضار، حماية المحاصيل</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="font-semibold mb-3 flex items-center">
+                        <span className="text-lg mr-2">🌦️</span>
+                        نصائح حسب حالة الطقس:
+                      </div>
+                      <div className="space-y-2 bg-white/5 p-3 rounded">
+                        <div>• <strong>مشمس:</strong> وقت مثالي للحصاد والتجفيف</div>
+                        <div>• <strong>غائم:</strong> جيد للزراعة والري</div>
+                        <div>• <strong>ماطر:</strong> تجنب الرش والتسميد</div>
+                        <div>• <strong>عاصف:</strong> حماية النباتات الحساسة</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Weather Actions */}
+                  <div className="mt-4 pt-4 border-t border-white/20">
+                    <div className="text-center text-xs opacity-80">
+                      📡 البيانات محدثة كل 10 دقائق من OpenWeatherMap • آخر تحديث: {new Date().toLocaleTimeString('ar-DZ')}
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold mb-2">{weatherData.windSpeed}</div>
-                  <div className="text-sm opacity-80">سرعة الرياح</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg text-center">
-                  <div className="text-xl font-bold mb-2">{weatherData.description}</div>
-                  <div className="text-sm opacity-80">وصف الطقس</div>
-                </div>
-              </div>
+              </>
             )}
+          </div>
+        </motion.div>
+
+        {/* Map Tools Guide */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="mt-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl shadow-2xl overflow-hidden"
+        >
+          <div className="p-6">
+            <h2 className="text-2xl font-bold text-center mb-6">
+              📏 دليل أدوات القياس والتفاعل
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white/10 backdrop-blur-sm p-5 rounded-lg">
+                <h3 className="text-lg font-bold mb-3 flex items-center">
+                  <span className="text-2xl mr-3">🖱️</span>
+                  التحكم بالخريطة
+                </h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
+                    <span><strong>النقر:</strong> تحليل الموقع والتربة</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
+                    <span><strong>السحب:</strong> تحريك الخريطة</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
+                    <span><strong>العجلة:</strong> تكبير وتصغير</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
+                    <span><strong>النقر على 🌾:</strong> معلومات المزرعة</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-white/10 backdrop-blur-sm p-5 rounded-lg">
+                <h3 className="text-lg font-bold mb-3 flex items-center">
+                  <span className="text-2xl mr-3">🔧</span>
+                  أدوات متقدمة
+                </h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                    <span><strong>قياس المسافة:</strong> زر "📏 قياس" ثم نقرتان</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                    <span><strong>مسح القياسات:</strong> زر "🗑️ مسح"</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                    <span><strong>نسخ الإحداثيات:</strong> من نافذة الموقع</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                    <span><strong>طبقات البيانات:</strong> قائمة أعلى اليمين</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-white/10 backdrop-blur-sm p-5 rounded-lg">
+                <h3 className="text-lg font-bold mb-3 flex items-center">
+                  <span className="text-2xl mr-3">🌍</span>
+                  طبقات الخريطة
+                </h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                    <span><strong>🗺️ عادية:</strong> الخريطة التقليدية</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                    <span><strong>🛰️ ساتل:</strong> صور جوية حقيقية</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                    <span><strong>🌱 تربة:</strong> بيانات الخصوبة</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                    <span><strong>🌤️ طقس:</strong> بيانات جوية مباشرة</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-white/10 backdrop-blur-sm p-5 rounded-lg">
+                <h3 className="text-lg font-bold mb-3 flex items-center">
+                  <span className="text-2xl mr-3">💡</span>
+                  نصائح سريعة
+                </h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mr-2"></span>
+                    <span>فعّل عدة طبقات معاً للمقارنة</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mr-2"></span>
+                    <span>استخدم الساتل لرؤية حالة المحاصيل</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mr-2"></span>
+                    <span>احفظ الإحداثيات المهمة</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mr-2"></span>
+                    <span>راقب الطقس قبل العمل الزراعي</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </motion.div>
 
