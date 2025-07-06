@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+
 
 const roadmap = [
   { 
@@ -83,7 +83,7 @@ const services = [
 ];
 
 export default function FutureServices() {
-  const [selectedService, setSelectedService] = useState<number | null>(null);
+
 
   const scrollToContact = () => {
     const contactSection = document.getElementById('contact-section');

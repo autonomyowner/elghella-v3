@@ -152,31 +152,7 @@ export default function PublicListings() {
     }
   };
 
-  // Add this function to refresh all listings after adding
-  const refreshAll = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data: productsData, error: prodErr } = await supabase
-        .from("products")
-        .select("*");
-      if (prodErr) throw prodErr;
-      setProducts(productsData || []);
 
-      const { data: equipmentData, error: eqErr } = await supabase
-        .from("equipments")
-        .select("*");
-      if (eqErr) throw eqErr;
-      setEquipment(equipmentData || []);
-
-      const landsData = await fetchLands();
-      setLands(landsData || []);
-    } catch (err: any) {
-      setError("فشل في تحميل العناصر العامة");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Edit post handler
   const handleEditPost = () => {
@@ -193,20 +169,7 @@ export default function PublicListings() {
     openEditListingModal(initialData);
   };
 
-  // Update listing in Supabase
-  const handleUpdateListing = async (updatedData: any) => {
-    let table = updatedData.type === "منتج" ? "products" : updatedData.type === "معدات" ? "equipments" : "lands";
-    let id = selectedPost.id;
-    let updateData = { ...updatedData };
-    if (table === "lands") {
-      updateData.name = updatedData.title;
-      delete updateData.title;
-    }
-    await supabase.from(table).update(updateData).eq("id", id);
-    openEditListingModal(null);
-    refreshAll();
-    closeModal();
-  };
+
 
   return (
     <section dir="rtl" className="relative min-h-screen flex flex-col bg-cover bg-center bg-no-repeat">

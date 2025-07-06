@@ -33,7 +33,8 @@ export default function Home() {
       </Helmet>
       <div>
         <Section1Hero id="hero" />
-        <div className="flex justify-center my-8">
+        <div className="flex flex-col items-center gap-4 my-8">
+          {/* Future Services Button */}
           <Link
             to="/future-services"
             className="inline-flex items-center bg-gradient-to-r from-blue-500/90 to-purple-600/90 backdrop-blur-sm text-white px-8 py-4 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-2xl border border-white/20"
