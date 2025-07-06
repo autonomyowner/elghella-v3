@@ -18,60 +18,69 @@ import Inbox from "./pages/Inbox";
 import AddExpert from "./pages/ExpertsPage/AddExpert";
 import ExpertsList from "./pages/ExpertsPage/ExpertsList";
 import SeedlingsPage from "./pages/SeedlingsPage";
+import FutureServices from "./pages/FutureServices";
+import LivestockMarket from "./pages/LivestockMarket";
+import BeekeepingServices from "./pages/BeekeepingServices";
+import { MarketplaceModalProvider } from "./context/MarketplaceModalContext";
 
 const AppRoutes = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
+    <MarketplaceModalProvider>
+      <Routes>
+        <Route path="/" element={<Home />} />
 
-      <Route path="/land-rent" element={<LandRent />} />
+        <Route path="/land-rent" element={<LandRent />} />
 
-      <Route path="/machine-rent" element={<MachineRent />} />
+        <Route path="/machine-rent" element={<MachineRent />} />
 
-      <Route path="/greengrocer" element={<Products />} />
+        <Route path="/greengrocer" element={<Products />} />
 
-      <Route path="/expertise" element={<Expertise />} />
+        <Route path="/expertise" element={<Expertise />} />
 
-      <Route path="/Login" element={<LoginPage />} />
-      <Route path="/Signup" element={<SignUpPage />} />
+        <Route path="/Login" element={<LoginPage />} />
+        <Route path="/Signup" element={<SignUpPage />} />
 
-      {/* Protected Routes */}
-      <Route element={<ProtectedRoute redirectTo="/" />}>
-        <Route path="/profile" element={<ProfilePage />} />
-      </Route>
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute redirectTo="/" />}>
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
 
-      <Route element={<ProtectedRoute redirectTo="/" />}>
-        <Route path="/manage" element={<ManageListingsPage />} />
-      </Route>
+        <Route element={<ProtectedRoute redirectTo="/" />}>
+          <Route path="/manage" element={<ManageListingsPage />} />
+        </Route>
 
-      <Route element={<ProtectedRoute redirectTo="/" />}>
-        <Route path="/settings" element={<SettingsPage />} />
-      </Route>
+        <Route element={<ProtectedRoute redirectTo="/" />}>
+          <Route path="/settings" element={<SettingsPage />} />
+        </Route>
 
-      <Route element={<ProtectedRoute redirectTo="/login" />}>
-        <Route path="/addproduct" element={<AddProducts />} />
-      </Route>
+        <Route element={<ProtectedRoute redirectTo="/login" />}>
+          <Route path="/addproduct" element={<AddProducts />} />
+        </Route>
 
-      <Route element={<ProtectedRoute redirectTo="/login" />}>
-        <Route path="/addlandrent" element={<AddLand />} />
-      </Route>
+        <Route element={<ProtectedRoute redirectTo="/login" />}>
+          <Route path="/addlandrent" element={<AddLand />} />
+        </Route>
 
-      <Route element={<ProtectedRoute redirectTo="/login" />}>
-        <Route path="/addequipment" element={<AddEquipment />} />
-      </Route>
+        <Route element={<ProtectedRoute redirectTo="/login" />}>
+          <Route path="/addequipment" element={<AddEquipment />} />
+        </Route>
 
-      <Route element={<ProtectedRoute redirectTo="/login" />}>
-        <Route path="/inbox" element={<Inbox />} />
-      </Route>
+        <Route element={<ProtectedRoute redirectTo="/login" />}>
+          <Route path="/inbox" element={<Inbox />} />
+        </Route>
 
-      <Route element={<ProtectedRoute redirectTo="/login" />}>
-        <Route path="/experts/add" element={<AddExpert />} />
-      </Route>
+        <Route element={<ProtectedRoute redirectTo="/login" />}>
+          <Route path="/experts/add" element={<AddExpert />} />
+        </Route>
 
-      <Route path="/publiclistings" element={<PublicListings />} />
-      <Route path="/experts" element={<ExpertsList />} />
-      <Route path="/SeedlingsPage" element={<SeedlingsPage />} />
-    </Routes>
+        <Route path="/publiclistings" element={<PublicListings />} />
+        <Route path="/experts" element={<ExpertsList />} />
+        <Route path="/SeedlingsPage" element={<SeedlingsPage />} />
+        <Route path="/future-services" element={<FutureServices />} />
+        <Route path="/services/livestock-market" element={<LivestockMarket />} />
+        <Route path="/services/beekeeping" element={<BeekeepingServices />} />
+      </Routes>
+    </MarketplaceModalProvider>
   );
 };
 

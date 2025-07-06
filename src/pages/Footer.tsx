@@ -153,11 +153,28 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Footer Bottom: Copyright */}
-        <div className="border-t border-white/10 mt-12 pt-6 text-center">
-          <p className="text-sm text-white/60 font-NeoSansArabicLight">
-            © 2024 جميع الحقوق محفوظة | مصمم بواسطة فريق التطوير
-          </p>
+        {/* Footer Bottom: Hadith in Golden Diamond */}
+        <div className="border-t border-white/10 mt-12 pt-6 text-center flex flex-col items-center justify-center">
+          <div className="relative inline-block px-8 py-6">
+            {/* Diamond background */}
+            <svg width="320" height="80" viewBox="0 0 320 80" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0" style={{filter: 'drop-shadow(0 0 16px gold)'}}>
+              <polygon points="160,0 320,40 160,80 0,40" fill="url(#gold-gradient)" stroke="#fff8dc" strokeWidth="3" />
+              <defs>
+                <linearGradient id="gold-gradient" x1="0" y1="0" x2="320" y2="80" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#fff8dc" />
+                  <stop offset="0.3" stopColor="#ffd700" />
+                  <stop offset="0.7" stopColor="#bfa14a" />
+                  <stop offset="1" stopColor="#fff8dc" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <span className="relative z-10 text-lg font-bold text-black drop-shadow-lg" style={{letterSpacing: '1px'}}>
+              قال رسول الله ﷺ:
+            </span>
+          </div>
+          <span className="mt-4 text-base font-normal text-white drop-shadow-[0_0_8px_white] block mb-1">
+            «إنْ قامَتِ السَّاعةُ وفي يدِ أحدِكُم فَسيلةٌ، فإنِ استَطاعَ أن لا تَقومَ حتَّى يغرِسَها، فلْيغرِسْها.»
+          </span>
         </div>
       </div>
     </footer>

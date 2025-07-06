@@ -5,6 +5,7 @@ import Section3Services from "./HomePage/Section3-Services";
 import Section4AboutUs from "./HomePage/Section4-AboutUs";
 import OffersSection from "../components/OffersSection";
 import { Helmet } from "react-helmet";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
@@ -32,6 +33,20 @@ export default function Home() {
       </Helmet>
       <div>
         <Section1Hero id="hero" />
+        <div className="flex justify-center my-8">
+          <Link
+            to="/future-services"
+            className="inline-flex items-center bg-gradient-to-r from-blue-500/90 to-purple-600/90 backdrop-blur-sm text-white px-8 py-4 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-2xl border border-white/20"
+            tabIndex={0}
+          >
+            <span className="text-3xl mr-4 animate-bounce">🚁</span>
+            <div className="text-center">
+              <div className="font-['NeoSansArabicBold'] text-lg">خدمات مستقبلية مبتكرة</div>
+              <div className="text-sm opacity-90">طائرات مسيرة | زراعة دقيقة | مراقبة ذكية</div>
+            </div>
+            <span className="bg-white/20 px-3 py-1 rounded-full text-xs mr-4 animate-pulse font-bold">قريباً 2026</span>
+          </Link>
+        </div>
         <OffersSection />
         <div className="h-4 bg-gradient-to-br from-gray-900 to-gray-8000" />
         <Section3Services id="services" />

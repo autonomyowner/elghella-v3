@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { fetchLands } from "../api/LandApi";
 import { supabase } from "../lib/supabaseClient";
 import { Product } from "../api/myProductApi";
-import HeroImage from "../assets/Profile/profile.jpg";
+// import HeroImage from "../assets/Profile/profile.jpg";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { sendMessage } from "../api/messagesApi";
 import ChatBox from "../components/ChatBox";
 import MarketplaceCard from "../components/MarketplaceCard";
+import { useMarketplaceModal } from "../context/MarketplaceModalContext";
 
 export default function PublicListings() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -28,6 +29,7 @@ export default function PublicListings() {
   const [sendError, setSendError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const { openAddListingModal, openEditListingModal } = useMarketplaceModal();
 
   // Fetch all items
   useEffect(() => {
@@ -150,19 +152,87 @@ export default function PublicListings() {
     }
   };
 
+  // Add this function to refresh all listings after adding
+  const refreshAll = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: productsData, error: prodErr } = await supabase
+        .from("products")
+        .select("*");
+      if (prodErr) throw prodErr;
+      setProducts(productsData || []);
+
+      const { data: equipmentData, error: eqErr } = await supabase
+        .from("equipments")
+        .select("*");
+      if (eqErr) throw eqErr;
+      setEquipment(equipmentData || []);
+
+      const landsData = await fetchLands();
+      setLands(landsData || []);
+    } catch (err: any) {
+      setError("فشل في تحميل العناصر العامة");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Edit post handler
+  const handleEditPost = () => {
+    if (!selectedPost) return;
+    // Map fields for modal
+    let initialData = {
+      title: selectedPost.title || selectedPost.name || "",
+      type: selectedPost._type === "product" ? "منتج" : selectedPost._type === "equipment" ? "معدات" : "أرض",
+      price: selectedPost.price || "",
+      location: selectedPost.location || "",
+      description: selectedPost.description || "",
+      image: Array.isArray(selectedPost.images) ? selectedPost.images[0] : selectedPost.image || ""
+    };
+    openEditListingModal(initialData);
+  };
+
+  // Update listing in Supabase
+  const handleUpdateListing = async (updatedData: any) => {
+    let table = updatedData.type === "منتج" ? "products" : updatedData.type === "معدات" ? "equipments" : "lands";
+    let id = selectedPost.id;
+    let updateData = { ...updatedData };
+    if (table === "lands") {
+      updateData.name = updatedData.title;
+      delete updateData.title;
+    }
+    await supabase.from(table).update(updateData).eq("id", id);
+    openEditListingModal(null);
+    refreshAll();
+    closeModal();
+  };
+
   return (
-    <section dir="rtl" className="relative min-h-screen flex flex-col">
+    <section dir="rtl" className="relative min-h-screen flex flex-col bg-cover bg-center bg-no-repeat">
+      {/* Floating Add Listing Button */}
+      {user && (
+        <button
+          onClick={openAddListingModal}
+          className="fixed bottom-8 left-8 z-50 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg px-6 py-3 text-lg font-bold flex items-center gap-2"
+        >
+          + إضافة إعلان
+        </button>
+      )}
       {/* Modal for post details and messaging */}
       {modalOpen && selectedPost && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
           <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md relative">
             <button onClick={closeModal} className="absolute left-4 top-4 text-gray-400 hover:text-red-400 text-2xl">×</button>
             <h3 className="text-xl font-bold text-green-400 mb-2 text-center">تفاصيل الإعلان</h3>
-            {/* Show image if available */}
-            {selectedPost._type === "equipment" && Array.isArray(selectedPost.images) && selectedPost.images.length > 0 ? (
-              <img src={selectedPost.images[0]} alt={selectedPost.name} className="w-full h-40 object-cover rounded mb-2" />
-            ) : null}
-            <div className="mb-2 text-white">
+            {/* Show image if available (for all types) */}
+            {selectedPost.image && (
+              <img src={selectedPost.image} alt={selectedPost.name || selectedPost.title} className="w-full h-40 object-cover rounded mb-2" />
+            )}
+            {Array.isArray(selectedPost.images) && selectedPost.images.length > 0 && !selectedPost.image && (
+              <img src={selectedPost.images[0]} alt={selectedPost.name || selectedPost.title} className="w-full h-40 object-cover rounded mb-2" />
+            )}
+            <div className="mb-2 text-white bg-gray-900 rounded p-2">
               <div className="font-bold">{selectedPost.name || selectedPost.title || "بدون اسم"}</div>
               <div className="text-sm text-gray-300">{selectedPost.type || "نوع غير محدد"}</div>
               {selectedPost.price && <div className="text-green-400">{selectedPost.price} دج</div>}
@@ -170,14 +240,22 @@ export default function PublicListings() {
               {selectedPost.condition && <div className="text-gray-400">{selectedPost.condition}</div>}
               {selectedPost.description && <div className="text-gray-400">{selectedPost.description}</div>}
             </div>
-            {/* Delete button for owner */}
+            {/* Edit/Delete buttons for owner */}
             {user && selectedPost.user_id === user.userId && (
-              <button
-                onClick={handleDeletePost}
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded mb-2 mt-2"
-              >
-                حذف المنشور
-              </button>
+              <div className="flex gap-2 mb-2">
+                <button
+                  onClick={handleEditPost}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded"
+                >
+                  تعديل
+                </button>
+                <button
+                  onClick={handleDeletePost}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded"
+                >
+                  حذف المنشور
+                </button>
+              </div>
             )}
             {/* Message form */}
             <div className="mt-4">
@@ -224,9 +302,9 @@ export default function PublicListings() {
           </div>
         </div>
       )}
-      <div className="absolute inset-0 z-0">
+      <div className="fixed inset-0 z-0">
         <img
-          src={HeroImage}
+          src="/assets/Homepage/west.webp"
           alt="Hero Background"
           className="w-full h-full object-cover"
         />

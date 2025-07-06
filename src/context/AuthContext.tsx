@@ -55,7 +55,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       };
       setUser(formattedUser);
       setIsAuthenticated(true);
-    } catch (error) {
+    } catch (error: any) {
+      // Automatic fix for Invalid Refresh Token
+      if (
+        error?.message?.includes("Invalid Refresh Token") ||
+        error?.message?.includes("Refresh Token Not Found")
+      ) {
+        // Remove all Supabase auth keys from localStorage
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith("sb-")) localStorage.removeItem(key);
+        });
+        window.location.reload();
+      }
       setUser(null);
       setIsAuthenticated(false);
       console.error("Failed to refresh user", error);
