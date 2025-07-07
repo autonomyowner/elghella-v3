@@ -20,7 +20,6 @@ export default function PublicListings() {
   const [productType, setProductType] = useState("");
   const [equipmentType, setEquipmentType] = useState("");
   const [landType, setLandType] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
   const { user } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<any>(null);
@@ -64,15 +63,12 @@ export default function PublicListings() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const searchQuery = params.get('search');
-    const tabFilter = params.get('tab');
     
     if (searchQuery) {
       setSearch(searchQuery);
     }
     
-    if (tabFilter) {
-      setActiveTab(tabFilter);
-    }
+    // Tab filter is handled by URL params directly
   }, [location.search]);
 
   // Filtered lists
