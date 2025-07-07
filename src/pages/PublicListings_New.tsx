@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchLands } from "../api/LandApi";
 import { supabase } from "../lib/supabaseClient";
 import { Product } from "../api/myProductApi";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { sendMessage } from "../api/messagesApi";
 import ChatBox from "../components/ChatBox";
@@ -10,7 +10,6 @@ import MarketplaceCard from "../components/MarketplaceCard";
 import { useMarketplaceModal } from "../context/MarketplaceModalContext";
 
 export default function PublicListings() {
-  const location = useLocation();
   const [products, setProducts] = useState<Product[]>([]);
   const [equipment, setEquipment] = useState<any[]>([]);
   const [lands, setLands] = useState<any[]>([]);
@@ -20,7 +19,6 @@ export default function PublicListings() {
   const [productType, setProductType] = useState("");
   const [equipmentType, setEquipmentType] = useState("");
   const [landType, setLandType] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
   const { user } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<any>(null);
@@ -59,21 +57,6 @@ export default function PublicListings() {
     };
     fetchAll();
   }, []);
-
-  // Handle search parameters from homepage
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const searchQuery = params.get('search');
-    const tabFilter = params.get('tab');
-    
-    if (searchQuery) {
-      setSearch(searchQuery);
-    }
-    
-    if (tabFilter) {
-      setActiveTab(tabFilter);
-    }
-  }, [location.search]);
 
   // Filtered lists
   const filteredProducts = products.filter(
@@ -322,7 +305,7 @@ export default function PublicListings() {
                 placeholder="بحث بالاسم..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-all duration-300 text-gray-800 bg-white placeholder-gray-500"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-all duration-300"
               />
             </div>
             <div>
@@ -330,7 +313,7 @@ export default function PublicListings() {
               <select
                 value={productType}
                 onChange={(e) => setProductType(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-all duration-300 text-gray-800 bg-white"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-all duration-300"
               >
                 <option value="">كل أنواع المنتجات</option>
                 <option value="الحبوب">🌾 الحبوب</option>
@@ -345,7 +328,7 @@ export default function PublicListings() {
               <select
                 value={equipmentType}
                 onChange={(e) => setEquipmentType(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-all duration-300 text-gray-800 bg-white"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-all duration-300"
               >
                 <option value="">كل أنواع المعدات</option>
                 <option value="جرار">🚜 جرار</option>
@@ -360,7 +343,7 @@ export default function PublicListings() {
               <select
                 value={landType}
                 onChange={(e) => setLandType(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-all duration-300 text-gray-800 bg-white"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-all duration-300"
               >
                 <option value="">كل أنواع الأراضي</option>
                 <option value="زراعية">🌾 زراعية</option>

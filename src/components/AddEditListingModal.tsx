@@ -35,6 +35,11 @@ const AddEditListingModal: React.FC<AddEditListingModalProps> = ({ open, onClose
 
   const handleSubmit = async () => {
     setError(null);
+    // Basic validation
+    if (!form.title || !form.price || !form.location || !form.description) {
+      setError("يرجى ملء جميع الحقول المطلوبة");
+      return;
+    }
     // Insert into the correct table based on type
     let table = form.type === "منتج" ? "products" : form.type === "معدات" ? "equipments" : "lands";
     const insertData = { ...form };
@@ -44,7 +49,7 @@ const AddEditListingModal: React.FC<AddEditListingModalProps> = ({ open, onClose
     }
     const { error } = await supabase.from(table).insert([insertData]);
     if (error) {
-      setError("فشل إضافة الإعلان");
+      setError(error.message || "فشل إضافة الإعلان"); // Show real error
       return;
     }
     onSave();
@@ -65,7 +70,8 @@ const AddEditListingModal: React.FC<AddEditListingModalProps> = ({ open, onClose
         <textarea name="description" value={form.description} onChange={handleChange} className="w-full mb-2 p-2 border rounded" placeholder="الوصف" rows={3} />
         <input type="file" accept="image/*" onChange={handleImageUpload} className="mb-2" />
         {uploading && <div className="text-blue-600 mb-2">جاري رفع الصورة...</div>}
-        {form.image && <img src={`https://YOUR_SUPABASE_URL/storage/v1/object/public/product-images/${form.image}`} alt="preview" className="w-full h-32 object-cover rounded mb-2" />}
+        {form.image && <img src={`https://idudgypbhjefelzshofm.supabase.co/storage/v1/object/public/product-images/${form.image}`} alt="preview" className="w-full h-32 object-cover rounded mb-2" />}
+        {/* Supabase project ref updated to your actual project */}
         {error && <div className="text-red-600 mb-2">{error}</div>}
         <AuthOnlyButton onClick={handleSubmit} className="w-full bg-green-600 text-white py-2 rounded font-bold mt-2">{initialData ? "حفظ التعديلات" : "إضافة الإعلان"}</AuthOnlyButton>
       </div>
@@ -73,4 +79,4 @@ const AddEditListingModal: React.FC<AddEditListingModalProps> = ({ open, onClose
   );
 };
 
-export default AddEditListingModal; 
+export default AddEditListingModal;

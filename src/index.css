@@ -147,3 +147,34 @@
 .leaflet-draw-tooltip-subsequent.leaflet-draw-tooltip-visible {
   visibility: visible;
 }
+
+/* 3D Flip Card Styles */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Mobile-specific styles - disable hover effect on mobile */
+@media (max-width: 768px) {
+  .group:hover .group-hover\:rotate-y-180 {
+    transform: none;
+  }
+}
+
+/* Ensure flip cards work properly on mobile */
+@media (hover: none) {
+  .group:hover .group-hover\:rotate-y-180 {
+    transform: none;
+  }
+}

@@ -21,6 +21,7 @@ import SeedlingsPage from "./pages/SeedlingsPage";
 import FutureServices from "./pages/FutureServices";
 import LivestockMarket from "./pages/LivestockMarket";
 import BeekeepingServices from "./pages/BeekeepingServices";
+import AboutUs from "./pages/AboutUs";
 import { MarketplaceModalProvider } from "./context/MarketplaceModalContext";
 
 const AppRoutes = () => {
@@ -79,6 +80,7 @@ const AppRoutes = () => {
         <Route path="/future-services" element={<FutureServices />} />
         <Route path="/services/livestock-market" element={<LivestockMarket />} />
         <Route path="/services/beekeeping" element={<BeekeepingServices />} />
+        <Route path="/about" element={<AboutUs />} />
       </Routes>
     </MarketplaceModalProvider>
   );

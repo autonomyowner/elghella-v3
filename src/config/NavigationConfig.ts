@@ -9,6 +9,6 @@ export const navigationLinks: NavLink[] = [
   { name: "سوق المواشي", href: "/services/livestock-market" },
   { name: "تربية النحل", href: "/services/beekeeping" },
   { name: "الخبراء", href: "/experts" },
-  { name: "من نحن", href: "our-story" }, // Scroll to 'our-story' section
+  { name: "من نحن", href: "/about" }, // About Us page
   { name: "اتصل بنا", href: "contact-section" }, // Scroll to contact section
 ];

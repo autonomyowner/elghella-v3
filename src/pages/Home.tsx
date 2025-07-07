@@ -4,6 +4,7 @@ import Section2OurStory from "./HomePage/Section2-OurStory";
 import Section3Services from "./HomePage/Section3-Services";
 import Section4AboutUs from "./HomePage/Section4-AboutUs";
 import OffersSection from "../components/OffersSection";
+import HomepageSearchBar from "../components/HomepageSearchBar";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 
@@ -33,6 +34,12 @@ export default function Home() {
       </Helmet>
       <div>
         <Section1Hero id="hero" />
+        
+        {/* Search Bar Section */}
+        <div className="py-12 px-4">
+          <HomepageSearchBar />
+        </div>
+        
         <div className="flex flex-col items-center gap-4 my-8">
           {/* Future Services Button */}
           <Link
