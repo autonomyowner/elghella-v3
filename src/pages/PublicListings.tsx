@@ -306,7 +306,7 @@ export default function PublicListings() {
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 mb-8 shadow-xl">
+        <div className="rounded-2xl p-6 mb-8 shadow-xl backdrop-blur-sm">
           <h3 className="text-xl font-bold text-gray-800 mb-4 font-NeoSansArabicBold">
             🔍 البحث والتصفية
           </h3>
@@ -381,7 +381,7 @@ export default function PublicListings() {
         ) : (
           <div className="space-y-12">
             {/* Products */}
-            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+            <div className="rounded-2xl p-6 shadow-xl backdrop-blur-sm">
               <h4 className="text-2xl font-bold text-gray-800 mb-6 font-NeoSansArabicBold">
                 🌾 المنتجات الزراعية
               </h4>
@@ -406,7 +406,7 @@ export default function PublicListings() {
             </div>
 
             {/* Equipment */}
-            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+            <div className="rounded-2xl p-6 shadow-xl backdrop-blur-sm">
               <h4 className="text-2xl font-bold text-gray-800 mb-6 font-NeoSansArabicBold">
                 🚜 المعدات الزراعية
               </h4>
@@ -431,7 +431,7 @@ export default function PublicListings() {
             </div>
 
             {/* Lands */}
-            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+            <div className="rounded-2xl p-6 shadow-xl backdrop-blur-sm">
               <h4 className="text-2xl font-bold text-gray-800 mb-6 font-NeoSansArabicBold">
                 🏞️ الأراضي الزراعية
               </h4>
