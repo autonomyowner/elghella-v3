@@ -8,7 +8,7 @@ const teamMembers = [
     name: "إسلام زلاق",
     title: "CEO",
     titleEn: "Chief Executive Officer",
-    image: "/assets/team/ceo.jpg",
+    image: "/assets/Homepage/islam.jpg", // Actual image for Islam
     bio: "المدير التنفيذي (CEO أو المدير العام) - الدور: هو القائد الأعلى المسؤول عن رسم التوجهات العامة واتخاذ القرارات الكبرى. أهميته: يحدد رؤية الشركة، يقود الفرق، يمثل الشركة أمام الشركاء والمستثمرين.",
     social: {
       linkedin: "#",
@@ -20,7 +20,7 @@ const teamMembers = [
     name: "عصام دواودة",
     title: "CFO",
     titleEn: "Chief Financial Officer",
-    image: "/assets/team/coo.jpg",
+    image: "/assets/Homepage/issam.jpg", // Actual image for Issam
     bio: "المسؤول المالي (CFO أو المحاسب الرئيسي) - الدور: يدير الأمور المالية والمحاسبية ويشرف على الميزانيات والمصاريف والاستثمارات. أهميته: يحافظ على استقرار الشركة المالي ويضمن اتخاذ قرارات مبنية على أرقام واقعية.",
     social: {
       linkedin: "#",
@@ -32,7 +32,7 @@ const teamMembers = [
     name: "عبد النور عيساني",
     title: "CTO",
     titleEn: "Chief Technology Officer",
-    image: "/assets/team/cto.jpg",
+    image: "/assets/Homepage/nono2.jpg", // Actual image for Nono
     bio: "المسؤول التقني أو الإنتاجي (CTO أو مدير العمليات) - الدور: يشرف على الجانب التقني أو الإنتاجي، حسب طبيعة الشركة (تقنية، صناعية، زراعية…). أهميته: يضمن أن المنتجات أو الخدمات تُنفذ بجودة وكفاءة، ويطور الابتكار الداخلي.",
     social: {
       linkedin: "#",
